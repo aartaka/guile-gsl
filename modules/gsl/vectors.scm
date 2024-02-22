@@ -2,7 +2,51 @@
   #:use-module (gsl core)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
-  #:use-module (srfi srfi-43))
+  #:use-module (srfi srfi-43)
+  #:export (vec-size
+            ;; Accessors
+            vec-get
+            vec-set!
+            vec-ptr
+            ;; (De)allocation
+            vec-alloc
+            vec-calloc
+            vec-free
+            vec-copy!
+            vec-copy
+            vec->vector
+            ;; Predicates
+            vec-null?
+            vec-positive?
+            vec-negative?
+            vec-non-negative?
+            vec-equal?
+            ;; Aggregate
+            vec-sum
+            vec-min
+            vec-min-index
+            vec-max
+            vec-max-index
+            ;; Views
+            vec-view
+            vec-view-reals
+            vec-view-imags
+            ;; Ops
+            vec-add!
+            vec-add
+            vec-subtract!
+            vec-subtract
+            vec-multiply!
+            vec-multiply
+            vec-divide!
+            vec-divide
+            vec-scale!
+            vec-scale
+            vec-add-constant!
+            vec-add-constant
+            vec-axpby!
+            ;; Utils
+            call-with-vec))
 
 ;; Access
 (define (vec-size vec)
