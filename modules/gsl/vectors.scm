@@ -1,7 +1,8 @@
 (define-module (gsl vectors)
   #:use-module (gsl core)
   #:use-module (system foreign)
-  #:use-module (srfi srfi-1))
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-43))
 
 ;; Access
 (define (vec-size vec)
@@ -39,11 +40,10 @@ FILL might be one of:
         ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
          vec fill))
        ((vector? fill)
-        (let set ((idx 0))
-          (when (and (< idx (vector-length fill))
-                     (< idx (vec-size vec)))
-            (vec-set! vec idx (vector-ref fill idx))
-            (set (+ 1 idx)))))
+        (vector-map
+         (lambda (idx elem)
+           (vec-set! vec idx elem))
+         fill))
        (else
         (error "Don't know how to fill a vector with" fill))))
     vec))
@@ -61,12 +61,8 @@ FILL might be one of:
     new-vec))
 
 (define (vec->vector vec)
-  (let ((vector (make-vector (vec-size vec))))
-    (let rec ((idx 0))
-      (when (< idx (vec-size vec))
-        (vector-set! vector idx (vec-get vec idx))
-        (rec (+ 1 idx))))
-    vector))
+  (vector-unfold (lambda (idx) (vec-get vec idx))
+                 (vec-size vec)))
 
 ;; Predicates
 (define (vec-null? vec)
