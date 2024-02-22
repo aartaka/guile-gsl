@@ -7,20 +7,20 @@
 (define (vec-size vec)
   (first (parse-c-struct vec (list size_t))))
 
-(define (bound-check-index vec i)
+(define (bound-check-vector vec i)
   (unless (< i (vec-size vec))
     (error (format #f "Trying to index vector ~s (of size ~d) with out-of-bounds index ~d" vec (vec-size vec) i))))
 
 (define (vec-get vec i)
-  (bound-check-index vec i)
+  (bound-check-vector vec i)
   ((foreign-fn "gsl_vector_get" `(* ,size_t) double) vec i))
 
 (define (vec-set! vec i val)
-  (bound-check-index vec i)
+  (bound-check-vector vec i)
   ((foreign-fn "gsl_vector_set" `(* ,size_t ,double) void) vec i val))
 
 (define (vec-ptr vec i)
-  (bound-check-index vec i)
+  (bound-check-vector vec i)
   "Get the pointer to the I-th element of VEC."
   ((foreign-fn "gsl_vector_ptr" `(* ,size_t) '*) vec i))
 
@@ -89,6 +89,7 @@ FILL might be one of:
 ;; Views
 ;; TODO: Stride
 (define (vec-view vec offset count)
+  (bound-check-vector vec (- (+ offset count) 1))
   ((foreign-fn "gsl_vector_subvector" `(* ,size_t ,size_t) '*)
    vec offset count))
 
