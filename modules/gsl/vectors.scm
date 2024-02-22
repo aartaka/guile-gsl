@@ -3,7 +3,7 @@
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
-  #:export (vec-size
+  #:export (vec-length
             ;; Accessors
             vec-get
             vec-set!
@@ -49,12 +49,12 @@
             call-with-vec))
 
 ;; Access
-(define (vec-size vec)
+(define (vec-length vec)
   (first (parse-c-struct vec (list size_t))))
 
 (define (bound-check-vector vec i)
-  (unless (< i (vec-size vec))
-    (error (format #f "Trying to index vector ~s (of size ~d) with out-of-bounds index ~d" vec (vec-size vec) i))))
+  (unless (< i (vec-length vec))
+    (error (format #f "Trying to index vector ~s (of size ~d) with out-of-bounds index ~d" vec (vec-length vec) i))))
 
 (define (vec-get vec i)
   (bound-check-vector vec i)
@@ -100,13 +100,13 @@ FILL might be one of:
   ((foreign-fn "gsl_vector_memcpy" '(* *) int)
    dest src))
 (define (vec-copy src)
-  (let ((new-vec (vec-alloc (vec-size src))))
+  (let ((new-vec (vec-alloc (vec-length src))))
     (vec-copy! src new-vec)
     new-vec))
 
 (define (vec->vector vec)
   (vector-unfold (lambda (idx) (vec-get vec idx))
-                 (vec-size vec)))
+                 (vec-length vec)))
 
 ;; Predicates
 (define (vec-null? vec)
