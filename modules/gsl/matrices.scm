@@ -3,7 +3,68 @@
   #:use-module (gsl vectors)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
-  #:use-module (srfi srfi-43))
+  #:use-module (srfi srfi-43)
+  #:export (;; Access
+            mtx-dimensions
+            mtx-rows
+            mtx-columns
+            mtx-get
+            mtx-set!
+            mtx-ptr
+            ;; (De)allocation
+            mtx-alloc
+            mtx-calloc
+            mtx-free
+            mtx-copy!
+            mtx-copy
+            mtx->2d-vector
+            ;; Predicates
+            mtx-null?
+            mtx-positive?
+            mtx-negative?
+            mtx-non-negative?
+            mtx-equal?
+            ;; Aggregates
+            mtx-min
+            mtx-min-index
+            mtx-max
+            mtx-max-index
+            mtx-norm1
+            ;; Views
+            mtx-row
+            mtx-column
+            mtx-diagonal
+            mtx-subdiagonal
+            mtx-superdiagonal
+            mtx-subrow
+            mtx-subcolumn
+            ;; Matrix<->vector
+            mtx-row->vec!
+            mtx-column->vec!
+            vec->mtx-row!
+            vec->mtx-column!
+            ;; Row/column ops.
+            mtx-transpose!
+            ;; Ops
+            mtx-add!
+            mtx-add
+            mtx-subtract!
+            mtx-subtract
+            mtx-multiply-elements!
+            mtx-multiply-elements
+            mtx-divide-elements!
+            mtx-divide-elements
+            mtx-scale!
+            mtx-scale
+            mtx-scale-columns!
+            mtx-scale-columns
+            mtx-scale-rows!
+            mtx-scale-rows
+            mtx-add-constant!
+            mtx-add-constant
+            ;; Helpers
+            call-with-mtx
+            ensure-gsl))
 
 ;; Access
 (define (mtx-dimensions mtx)
