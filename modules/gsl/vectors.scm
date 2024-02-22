@@ -43,7 +43,9 @@ FILL might be one of:
           (when (and (< idx (vector-length fill))
                      (< idx (vec-size vec)))
             (vec-set! vec idx (vector-ref fill idx))
-            (set (+ 1 idx)))))))
+            (set (+ 1 idx)))))
+       (else
+        (error "Don't know how to fill a vector with" fill))))
     vec))
 (define vec-calloc
   (foreign-fn "gsl_vector_calloc" (list size_t) '*))
@@ -114,7 +116,7 @@ FILL might be one of:
   "Wrapper to generate the non-destructive versions of GSL ops."
   (lambda (vec arg)
     (let ((new (vec-copy vec)))
-      (op vec arg)
+      (op new arg)
       new)))
 
 (define vec-add! (foreign-fn "gsl_vector_add" '(* *) int))
