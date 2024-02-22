@@ -137,3 +137,9 @@ FILL might be one of:
   "Perform αx + βy and store the result in Y."
   ((foreign-fn "gsl_vector_axpby" `(,double * ,double *) int)
    alpha x beta y))
+
+(define (call-with-vec size fill thunk)
+  (let* ((vec (vec-alloc size fill))
+         (result (thunk vec)))
+    (vec-free vec)
+    result))
