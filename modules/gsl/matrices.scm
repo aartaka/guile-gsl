@@ -103,7 +103,9 @@ FILL might be one of:
          (lambda (row vec)
            (vector-map
             (lambda (column elem)
-              (mtx-set! mtx row column elem))
+              (when (and (< row (mtx-rows mtx))
+                         (< column (mtx-columns mtx)))
+                (mtx-set! mtx row column elem)))
             vec))
          fill))
        (else

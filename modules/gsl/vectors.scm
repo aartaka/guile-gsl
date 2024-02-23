@@ -79,7 +79,8 @@ FILL might be one of:
        ((vector? fill)
         (vector-map
          (lambda (idx elem)
-           (vec-set! vec idx elem))
+           (when (< idx (vec-length vec))
+             (vec-set! vec idx elem)))
          fill))
        (else
         (error "Don't know how to fill a vector with" fill))))
