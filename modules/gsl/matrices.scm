@@ -247,6 +247,7 @@ DEST might be one of:
 (define mtx-add-constant! (foreign-fn "gsl_matrix_add_constant" '(* *) int))
 (define mtx-add-constant (act-on-copy mtx-add-constant!))
 
+;; TODO: call-with-mtx-copy
 (define (call-with-mtx rows columns fill thunk)
   (let* ((mtx (mtx-alloc rows columns fill))
          (result (thunk mtx)))

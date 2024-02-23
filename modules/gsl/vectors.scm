@@ -178,6 +178,7 @@ FILL might be one of:
   ((foreign-fn "gsl_vector_axpby" `(,double * ,double *) int)
    alpha x beta y))
 
+;; TODO: call-with-vec-copy
 (define (call-with-vec size fill thunk)
   (let* ((vec (vec-alloc size fill))
          (result (thunk vec)))
