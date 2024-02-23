@@ -117,8 +117,17 @@ FILL might be one of:
   (foreign-fn "gsl_matrix_free" '(*) void))
 
 (define (mtx-copy! src dest)
-  ((foreign-fn "gsl_matrix_memcpy" '(* *) int)
-   dest src))
+  ;; FIXME: This implementation kills the process.
+  ;; ((foreign-fn "gsl_matrix_memcpy" '(* *) int)
+  ;;  dest src)
+  (let row-rec ((row 0))
+    (when (< row (mtx-rows src))
+      (let column-rec ((column 0))
+        (when (< column (mtx-columns src))
+          (mtx-set! dest row column
+                    (mtx-get src row column))
+          (column-rec (+ 1 column))))
+      (row-rec (+ 1 row)))))
 (define (mtx-copy src)
   (let ((new-mtx (mtx-alloc (mtx-rows src) (mtx-columns src))))
     (mtx-copy! src new-mtx)
