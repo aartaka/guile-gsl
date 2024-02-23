@@ -104,6 +104,10 @@ FILL might be one of:
     (vec-copy! src new-vec)
     new-vec))
 
+(define (vec-swap! a b)
+  ((foreign-fn "gsl_vector_swap" '(* *) int)
+   a b))
+
 (define (vec->vector vec)
   (vector-unfold (lambda (idx) (vec-get vec idx))
                  (vec-length vec)))
