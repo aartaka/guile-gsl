@@ -29,7 +29,6 @@
             mtx-min-index
             mtx-max
             mtx-max-index
-            mtx-norm1
             ;; Views
             mtx-row
             mtx-column
@@ -160,7 +159,8 @@ FILL might be one of:
 (define mtx-min-index (foreign-fn "gsl_matrix_min_index" '(*) double))
 (define mtx-max (foreign-fn "gsl_matrix_max" '(*) double))
 (define mtx-max-index (foreign-fn "gsl_matrix_max_index" '(*) double))
-(define mtx-norm1 (foreign-fn "gsl_matrix_norm1" '(*) double))
+;; FIXME: Segfaults.
+;; (define mtx-norm1 (foreign-fn "gsl_matrix_norm1" '(*) double))
 
 ;; TODO: Views
 
