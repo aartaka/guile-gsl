@@ -14,6 +14,9 @@
    #:return-type return-type
    #:arg-types args))
 
+(define (strerror errno)
+  (pointer->string ((foreign-fn "gsl_strerror" (list int) '*) errno)))
+
 (define (set-error-handler handler)
   ((foreign-fn "gsl_set_error_handler" '(*) '*)
    (cond
@@ -26,9 +29,11 @@
      handler))))
 
 ;; (set-error-handler
-;;  (lambda* (reason #:optional file line errno)
-;;    (let ((error-text (format #f "Error ~d (~a:~d): ~a"
-;;                              errno (pointer->string file) line (pointer->string reason))))
+;;  (lambda* (#:optional reason file line errno #:rest rest)
+;;    (let ((error-text
+;;           (format #f "Error ~d (~a ~a:~d): ~a"
+;;                   errno (strerror errno) (pointer->string file) line
+;;                   (pointer->string reason))))
 ;;      (display error-text)
 ;;      (newline)
 ;;      (error error-text))))
