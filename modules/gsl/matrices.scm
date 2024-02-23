@@ -74,21 +74,13 @@
 (define (mtx-columns mtx)
   (second (mtx-dimensions mtx)))
 
-(define (bound-check-matrix mtx row column)
-  (unless (and (< row (mtx-rows mtx))
-               (< column (mtx-columns mtx)))
-    (error (format #f "Trying to index matrix ~s (of size ~dx~d) with out-of-bounds indices ~dx~d" mtx (mtx-rows mtx) (mtx-columns mtx) row column))))
-
 (define (mtx-get mtx row column)
-  (bound-check-matrix mtx row column)
   ((foreign-fn "gsl_matrix_get" `(* ,size_t ,size_t) double)
    mtx row column))
 (define (mtx-set! mtx row column val)
-  (bound-check-matrix mtx row column)
   ((foreign-fn "gsl_matrix_set" `(* ,size_t ,size_t ,double) void)
    mtx row column val))
 (define (mtx-ptr mtx row column)
-  (bound-check-matrix mtx row column)
   ((foreign-fn "gsl_matrix_ptr" `(* ,size_t ,size_t) '*)
    mtx row column))
 
@@ -165,10 +157,8 @@ FILL might be one of:
 
 (define (mtx-row mtx row)
   "Return a gsl_vector_view for Nth row of MTX."
-  (bound-check-matrix mtx row 0)
   ((foreign-fn "gsl_matrix_row" `(* ,size_t) '*) mtx row))
 (define (mtx-column mtx column)
-  (bound-check-matrix mtx 0 column)
   "Return a gsl_vector_view for Nth column of MTX."
   ((foreign-fn "gsl_matrix_column" `(* ,size_t) '*) mtx column))
 
@@ -184,31 +174,25 @@ FILL might be one of:
 (define (mtx-subrow mtx row offset size)
   "Return a gsl_vector_view for ROWth row of MTX.
 The view starts from OFFSETth element of the row and stretches for SIZE elements."
-  (bound-check-matrix mtx row 0)
   ((foreign-fn "gsl_matrix_subrow" `(* ,size_t ,size_t ,size_t) '*) mtx row offset size))
 (define (mtx-subcolumn mtx column offset size)
   "Return a gsl_vector_view for COLUMNth column of MTX.
 The view starts from OFFSETth element of the column and stretches for SIZE elements."
-  (bound-check-matrix mtx 0 column)
   ((foreign-fn "gsl_matrix_subcolumn" `(* ,size_t ,size_t ,size_t) '*) mtx column offset size))
 
 ;; Destructive matrix<->vector copying.
 
 (define (mtx-row->vec! mtx row vec)
-  (bound-check-matrix mtx row 0)
   ((foreign-fn "gsl_matrix_get_row" `(* * ,size_t) int)
    vec mtx row))
 (define (mtx-column->vec! mtx column vec)
-  (bound-check-matrix mtx 0 column)
   ((foreign-fn "gsl_matrix_get_col" `(* * ,size_t) int)
    vec mtx column))
 
 (define (vec->mtx-row! vec mtx row)
-  (bound-check-matrix mtx row 0)
   ((foreign-fn "gsl_matrix_set_row" `(* ,size_t *))
    mtx row vec))
 (define (vec->mtx-column! vec mtx column)
-  (bound-check-matrix mtx 0 column)
   ((foreign-fn "gsl_matrix_set_col" `(* ,size_t *))
    mtx column vec))
 
