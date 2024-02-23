@@ -282,4 +282,4 @@ DEST might be one of:
          (vector-every number? thing))
     (vec-alloc (vector-length thing) thing))
    (else
-    (error "Cannot covert to GSL vector/matrix: " thing))))
+    (error "Cannot convert to GSL vector/matrix: " thing))))
