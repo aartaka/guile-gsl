@@ -13,3 +13,22 @@
    libgsl name
    #:return-type return-type
    #:arg-types args))
+
+(define (set-error-handler handler)
+  ((foreign-fn "gsl_set_error_handler" '(*) '*)
+   (cond
+    ((procedure? handler)
+     (procedure->pointer
+      void
+      handler
+      `(* * ,int ,int)))
+    ((pointer? handler)
+     handler))))
+
+;; (set-error-handler
+;;  (lambda* (reason #:optional file line errno)
+;;    (let ((error-text (format #f "Error ~d (~a:~d): ~a"
+;;                              errno (pointer->string file) line (pointer->string reason))))
+;;      (display error-text)
+;;      (newline)
+;;      (error error-text))))
