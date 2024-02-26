@@ -1,0 +1,41 @@
+(define-module (guile-gsl-package)
+ #:use-module (gnu packages guile)
+ #:use-module (gnu packages maths)
+ #:use-module (guix packages)
+ #:use-module (guix gexp)
+ #:use-module (guix utils)
+ #:use-module (guix build-system guile)
+ #:use-module (guix git-download)
+ #:use-module ((guix licenses) #:prefix license:))
+
+(define-public guile-gsl
+  (package
+    (name "guile-gsl")
+    (version "0.0.1")
+    (source (local-file ".."
+                        "guile-gsl-checkout"
+                        #:recursive? #t
+                        #:select? (or (git-predicate (dirname (current-source-directory)))
+                                      (const #t))))
+    (build-system guile-build-system)
+    (arguments
+     '(#:source-directory "modules"
+       #:phases (modify-phases %standard-phases
+                  (add-before 'build 'substitute-gsl-so
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let ((gsl (string-append (assoc-ref inputs "gsl")
+                                                "/lib/libgsl.so"))
+                            (cblas (string-append (assoc-ref inputs "gsl")
+                                                  "/lib/libgslcblas.so")))
+                        (substitute* '("modules/gsl/core.scm")
+                          (("libgsl.so")
+                           gsl))
+                        #t))))))
+    (native-inputs (list guile-3.0))
+    (inputs (list guile-3.0 gsl))
+    (home-page "https://github.com/aartaka/guile-gsl")
+    (synopsis "Bindings for GNU Scientific library.")
+    (description "Scheme wrapper around libgsl.so.")
+    (license license:gpl3+)))
+
+guile-gsl
