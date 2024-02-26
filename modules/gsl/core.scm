@@ -2,7 +2,8 @@
   #:use-module (system foreign)
   #:use-module (system foreign-library)
   #:use-module (system foreign-object)
-  #:export (foreign-fn))
+  #:export (foreign-fn
+            make-c-ptr))
 
 (define libgsl (load-foreign-library "libgsl.so"))
 ;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
@@ -13,6 +14,9 @@
    libgsl name
    #:return-type return-type
    #:arg-types args))
+
+(define* (make-c-ptr type #:optional (val 0))
+  (make-c-struct (list type) (list val)))
 
 (define (strerror errno)
   (pointer->string ((foreign-fn "gsl_strerror" (list int) '*) errno)))
