@@ -176,33 +176,6 @@ FILL might be one of:
 
 ;; TODO: Views
 
-;; Row and column views
-
-(define (mtx-row mtx row)
-  "Return a gsl_vector_view for Nth row of MTX."
-  ((foreign-fn "gsl_matrix_row" `(* ,size_t) '*) mtx row))
-(define (mtx-column mtx column)
-  "Return a gsl_vector_view for Nth column of MTX."
-  ((foreign-fn "gsl_matrix_column" `(* ,size_t) '*) mtx column))
-
-(define (mtx-diagonal mtx)
-  ((foreign-fn "gsl_matrix_diagonal" '(*) '*) mtx))
-(define (mtx-subdiagonal mtx n)
-  "Nth sub-diagonal (below the main diagonal) of MTX."
-  ((foreign-fn "gsl_matrix_subdiagonal" `(* ,size_t) '*) mtx n))
-(define (mtx-superdiagonal mtx n)
-  "Nth super-diagonal (above the main diagonal) of MTX."
-  ((foreign-fn "gsl_matrix_superdiagonal" `(* ,size_t) '*) mtx n))
-
-(define (mtx-subrow mtx row offset size)
-  "Return a gsl_vector_view for ROWth row of MTX.
-The view starts from OFFSETth element of the row and stretches for SIZE elements."
-  ((foreign-fn "gsl_matrix_subrow" `(* ,size_t ,size_t ,size_t) '*) mtx row offset size))
-(define (mtx-subcolumn mtx column offset size)
-  "Return a gsl_vector_view for COLUMNth column of MTX.
-The view starts from OFFSETth element of the column and stretches for SIZE elements."
-  ((foreign-fn "gsl_matrix_subcolumn" `(* ,size_t ,size_t ,size_t) '*) mtx column offset size))
-
 ;; Destructive matrix<->vector copying.
 
 (define (mtx-row->vec! mtx row vec)

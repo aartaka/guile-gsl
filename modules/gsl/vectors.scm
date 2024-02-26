@@ -133,26 +133,7 @@ FILL might be one of:
 (define vec-max (foreign-fn "gsl_vector_max" '(*) double))
 (define vec-max-index (foreign-fn "gsl_vector_max_index" '(*) double))
 
-;; Views
-;; TODO: Stride
-(define (vec-view vec offset count)
-  ((foreign-fn "gsl_vector_subvector" `(* ,size_t ,size_t) '*)
-   vec offset count))
-
-(define (vec-view-reals vec)
-  "Return a vector view of the real parts of the complex vector VEC."
-  ((foreign-fn "gsl_vector_complex_real" '(*) '*) vec))
-
-(define (vec-view-imags vec)
-  "Return a vector view of the imaginary parts of the complex vector VEC."
-  ((foreign-fn "gsl_vector_complex_imag" '(*) '*) vec))
-
-(define (vector->vec-view v)
-  "Return a vector view for Scheme vector (of real numbers) V."
-  ((foreign-fn "gsl_vector_view_array" `(* ,size_t) '*)
-   (make-c-struct (make-list (vector-length v) double)
-                  (vector->list v))
-   (vector-length v)))
+;; TODO: Views (segfault on my machine)
 
 ;; Operations
 
