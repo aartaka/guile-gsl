@@ -36,7 +36,7 @@
      handler))))
 
 ;; (set-error-handler
-;;  (lambda* (#:optional reason file line errno #:rest rest)
+;;  (lambda* (#:optional reason file line (errno -1) #:rest rest)
 ;;    (let ((error-text
 ;;           (format #f "Error ~d (~a ~a:~d): ~a"
 ;;                   errno (strerror errno) (pointer->string file) line
