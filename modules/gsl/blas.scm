@@ -77,7 +77,7 @@
 ;; Level 1
 
 (define (ddot vec1 vec2)
-  (let ((result (make-c-struct (list double) (list 0.0))))
+  (let ((result (make-c-ptr double)))
     ((blas-fn "ddot" '(* * *)) vec1 vec2 result)
     (first (parse-c-struct result (list double)))))
 
