@@ -156,9 +156,21 @@ FILL might be one of:
 ;; Aggregates
 
 (define mtx-min (foreign-fn "gsl_matrix_min" '(*) double))
-(define mtx-min-index (foreign-fn "gsl_matrix_min_index" '(*) double))
+(define (mtx-min-index mtx)
+  (let ((row (make-c-struct (list size_t) (list 0)))
+        (column (make-c-struct (list size_t) (list 0))))
+    ((foreign-fn "gsl_matrix_min_index" '(* * *) void)
+     mtx row column)
+    (append (parse-c-struct row (list size_t))
+            (parse-c-struct column (list size_t)))))
 (define mtx-max (foreign-fn "gsl_matrix_max" '(*) double))
-(define mtx-max-index (foreign-fn "gsl_matrix_max_index" '(*) double))
+(define (mtx-max-index mtx)
+  (let ((row (make-c-struct (list size_t) (list 0)))
+        (column (make-c-struct (list size_t) (list 0))))
+    ((foreign-fn "gsl_matrix_max_index" '(* * *) void)
+     mtx row column)
+    (append (parse-c-struct row (list size_t))
+            (parse-c-struct column (list size_t)))))
 ;; FIXME: Segfaults.
 ;; (define mtx-norm1 (foreign-fn "gsl_matrix_norm1" '(*) double))
 
