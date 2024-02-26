@@ -234,7 +234,16 @@ DEST might be one of:
                                          (error "Cannot transpose a non-square matrix in place!")))
                     ((pointer? dest) dest)
                     (else (error "Cannot copy transposed matrix into " dest)))))
-    ((foreign-fn "gsl_matrix_transpose_memcpy" '(* *) int) real-dest mtx)
+    (let row-rec ((row 0))
+      (when (< row (mtx-rows mtx))
+        (let column-rec ((column 0))
+          (when (< column (mtx-columns mtx))
+            (mtx-set! real-dest column row (mtx-get mtx row column))
+            (column-rec (+ 1 column))))
+        (row-rec (+ 1 row))))
+    ;; FIXME: Segfaults.
+    ;; ((foreign-fn "gsl_matrix_transpose_memcpy" '(* *) int)
+    ;;  real-dest mtx)
     real-dest))
 
 ;; Math operations
