@@ -8,6 +8,9 @@
 (define libgsl (load-foreign-library "libgsl.so"))
 ;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
 
+(define (1+ x)
+  (+ 1 x))
+
 (define* (foreign-fn name args #:optional (return-type int))
   "Generate `foreign-library-function' from a shorter form."
   (foreign-library-function

@@ -99,7 +99,7 @@ FILL might be one of:
   (let rec ((idx 0))
     (when (< idx (vec-length src))
       (vec-set! dest idx (vec-get src idx))
-      (rec (+ 1 idx)))))
+      (rec (1+ idx)))))
 (define (vec-copy src)
   (let ((new-vec (vec-alloc (vec-length src))))
     (vec-copy! src new-vec)
@@ -181,7 +181,7 @@ FILL might be one of:
   (let rec ((idx 0))
     (when (< idx (vec-length vec))
       (vec-set! vec idx (* scalar (vec-get vec idx)))
-      (rec (+ 1 idx)))))
+      (rec (1+ idx)))))
 (define vec-scale (act-on-copy vec-scale!))
 
 (define vec-add-constant! (foreign-fn "gsl_vector_add_constant" `(* ,double) int))

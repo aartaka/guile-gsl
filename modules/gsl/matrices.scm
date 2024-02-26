@@ -125,8 +125,8 @@ FILL might be one of:
         (when (< column (mtx-columns src))
           (mtx-set! dest row column
                     (mtx-get src row column))
-          (column-rec (+ 1 column))))
-      (row-rec (+ 1 row)))))
+          (column-rec (1+ column))))
+      (row-rec (1+ row)))))
 (define (mtx-copy src)
   (let ((new-mtx (mtx-alloc (mtx-rows src) (mtx-columns src))))
     (mtx-copy! src new-mtx)
@@ -239,8 +239,8 @@ DEST might be one of:
         (let column-rec ((column 0))
           (when (< column (mtx-columns mtx))
             (mtx-set! real-dest column row (mtx-get mtx row column))
-            (column-rec (+ 1 column))))
-        (row-rec (+ 1 row))))
+            (column-rec (1+ column))))
+        (row-rec (1+ row))))
     ;; FIXME: Segfaults.
     ;; ((foreign-fn "gsl_matrix_transpose_memcpy" '(* *) int)
     ;;  real-dest mtx)
