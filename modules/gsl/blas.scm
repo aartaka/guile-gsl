@@ -1,7 +1,9 @@
 (define-module (gsl blas)
   #:use-module (gsl core)
+  #:use-module (gsl vectors)
   #:use-module (gsl matrices)
   #:use-module (system foreign)
+  #:use-module (system foreign-library)
   #:use-module (srfi srfi-1)
   #:export (+row-major+
             +col-major+
@@ -46,6 +48,12 @@
             dtrsm!
             dsyrk!
             dsyrk2!))
+
+;; FIXME: Bundled library that exists to ensure that both libgsl.so
+;; and libgslcblas.so are loaded into Scheme image. Otherwise it
+;; cannot find CBLAS bindings.
+(define libguilegslblas (load-foreign-library "libguilegslblas.so"))
+;; (define libguilegslblas (load-foreign-library "/home/aartaka/git/guile-gsl/libguilegslblas.so"))
 
 ;; TODO: What are default-ish values for order, uplo, diag, and side?
 ;; Order.
