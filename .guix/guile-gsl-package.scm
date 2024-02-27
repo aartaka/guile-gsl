@@ -24,9 +24,7 @@
                   (add-before 'build 'substitute-gsl-so
                     (lambda* (#:key inputs #:allow-other-keys)
                       (let ((gsl (string-append (assoc-ref inputs "gsl")
-                                                "/lib/libgsl.so"))
-                            (cblas (string-append (assoc-ref inputs "gsl")
-                                                  "/lib/libgslcblas.so")))
+                                                "/lib/libgsl.so")))
                         (substitute* '("modules/gsl/core.scm")
                           (("libgsl.so")
                            gsl))
