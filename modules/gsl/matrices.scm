@@ -259,6 +259,16 @@ DEST might be one of:
     (mtx-free mtx)
     result))
 
+(define (for-mtx thunk mtx)
+  "Call THUNK with every (ROW COLUMN VALUE) of MTX."
+  (let row-rec ((row 0))
+    (when (< row (mtx-rows mtx))
+      (let column-rec ((column 0))
+        (when (< column (mtx-columns mtx))
+          (thunk row column (mtx-get mtx row column))
+          (column-rec (1+ column))))
+      (row-rec (1+ row)))))
+
 (define (ensure-gsl thing)
   (cond
    ((pointer? thing)

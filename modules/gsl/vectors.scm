@@ -179,3 +179,10 @@ FILL might be one of:
          (result (thunk vec)))
     (vec-free vec)
     result))
+
+(define (for-vec thunk vec)
+  "Call THUNK with (INDEX VALUE) of every element in VEC."
+  (let for ((idx 0))
+    (when (< idx (vec-length vec))
+      (thunk idx (vec-get vec idx))
+      (for (1+ idx)))))
