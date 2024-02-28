@@ -90,6 +90,10 @@ FILL might be one of:
 (define vec-free
   (foreign-fn "gsl_vector_free" '(*) void))
 
+(define (vec-fill! vec fill)
+  ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
+   vec fill))
+
 (define (vec-copy! src dest)
   ;; FIXME: This is the right implementation, but it kills the process
   ;; without any indication of what went wrong.

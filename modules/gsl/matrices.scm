@@ -115,6 +115,10 @@ FILL might be one of:
 (define mtx-free
   (foreign-fn "gsl_matrix_free" '(*) void))
 
+(define (mtx-fill! mtx fill)
+  ((foreign-fn "gsl_matrix_set_all" `(* ,double) void)
+   mtx fill))
+
 (define (mtx-copy! src dest)
   ;; FIXME: This implementation kills the process.
   ;; ((foreign-fn "gsl_matrix_memcpy" '(* *) int)
