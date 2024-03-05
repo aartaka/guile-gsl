@@ -63,6 +63,7 @@
             mtx-add-constant
             ;; Helpers
             call-with-mtx
+            for-mtx
             ensure-gsl))
 
 ;; Access

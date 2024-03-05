@@ -46,7 +46,8 @@
             vec-add-constant
             vec-axpby!
             ;; Utils
-            call-with-vec))
+            call-with-vec
+            for-vec))
 
 ;; Access
 (define (vec-length vec)
