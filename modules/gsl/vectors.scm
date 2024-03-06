@@ -70,15 +70,15 @@ FILL might be one of:
 - #f for uninitialized vector (garbage values, use `vec-calloc' for
   zero-initialized or numeric FILL for constant-initialized vector).
 - Real number to fill the vector with the same double value.
-- Scheme vector of real numbers."
+- Scheme vector/list of real numbers."
   (let ((vec ((foreign-fn "gsl_vector_alloc" (list size_t) '*) k)))
     (when fill
       (cond
        ((number? fill)
         ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
          vec fill))
-       ((vector? fill)
-        (vector-map
+       ((sequence? fill)
+        (for-sequence
          (lambda (idx elem)
            (when (< idx (vec-length vec))
              (vec-set! vec idx elem)))

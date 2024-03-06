@@ -3,13 +3,33 @@
   #:use-module (system foreign-library)
   #:use-module (system foreign-object)
   #:export (foreign-fn
-            make-c-ptr))
+            make-c-ptr
+            sequence?
+            for-sequence))
 
 (define libgsl (load-foreign-library "libgsl.so"))
 ;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
 
 (define (1+ x)
   (+ 1 x))
+
+(define (sequence? seq)
+  (or (list? seq)
+      (vector? seq)))
+
+(define (for-sequence thunk seq)
+  (if (sequence? seq)
+      (let rec ((idx 0))
+        (when (< idx ((if (list? seq)
+                          length
+                          vector-length)
+                      seq))
+          (thunk idx ((if (list? seq)
+                          list-ref
+                          vector-ref)
+                      seq idx))
+          (rec (1+ idx))))
+      (error "for-seq called on a non-sequence: " seq)))
 
 (define* (foreign-fn name args #:optional (return-type int))
   "Generate `foreign-library-function' from a shorter form."

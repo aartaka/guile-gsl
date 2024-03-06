@@ -98,10 +98,10 @@ FILL might be one of:
        ((number? fill)
         ((foreign-fn "gsl_matrix_set_all" `(* ,double) void)
          mtx fill))
-       ((vector? fill)
-        (vector-map
+       ((sequence? fill)
+        (for-sequence
          (lambda (row vec)
-           (vector-map
+           (for-sequence
             (lambda (column elem)
               (when (and (< row (mtx-rows mtx))
                          (< column (mtx-columns mtx)))
