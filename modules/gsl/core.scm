@@ -5,6 +5,8 @@
   #:export (foreign-fn
             make-c-ptr
             sequence?
+            sequence-ref
+            sequence-length
             for-sequence))
 
 (define libgsl (load-foreign-library "libgsl.so"))
@@ -16,6 +18,18 @@
 (define (sequence? seq)
   (or (list? seq)
       (vector? seq)))
+
+(define (sequence-ref seq k)
+  ((if (list? seq)
+       list-ref
+       vector-ref)
+   seq k))
+
+(define (sequence-length seq)
+  ((if (list? seq)
+       length
+       vector-length)
+   seq))
 
 (define (for-sequence thunk seq)
   (if (sequence? seq)

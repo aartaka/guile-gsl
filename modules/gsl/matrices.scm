@@ -278,17 +278,12 @@ DEST might be one of:
   (cond
    ((pointer? thing)
     thing)
-   ((and (vector? thing)
-         (vector? (vector-ref thing 0))
-         (vector-every
-          (lambda (vec)
-            (vector-every number? vec))
-          thing))
-    (mtx-alloc (vector-length thing)
-               (vector-length (vector-ref thing 0))
+   ((and (sequence? thing)
+         (sequence? (sequence-ref thing 0)))
+    (mtx-alloc (sequence-length thing)
+               (sequence-length (sequence-ref thing 0))
                thing))
-   ((and (vector? thing)
-         (vector-every number? thing))
-    (vec-alloc (vector-length thing) thing))
+   ((sequence? thing)
+    (vec-alloc (sequence-length thing) thing))
    (else
     (error "Cannot convert to GSL vector/matrix: " thing))))
