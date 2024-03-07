@@ -73,8 +73,10 @@
 ;;  (lambda* (#:optional reason file line (errno -1) #:rest rest)
 ;;    (let ((error-text
 ;;           (format #f "Error ~d (~a ~a:~d): ~a"
-;;                   errno (strerror errno) (pointer->string file) line
-;;                   (pointer->string reason))))
+;;                   errno (strerror errno)
+;;                   (when file (pointer->string file)) (or line 0)
+;;                   (when reason
+;;                     (pointer->string reason)))))
 ;;      (display error-text)
 ;;      (newline)
 ;;      (error error-text))))
