@@ -264,6 +264,13 @@ DEST might be one of:
     (mtx-free mtx)
     result))
 
+(define-syntax-rule (with-mtx (mtx rows columns fill) body ...)
+  "Run BODY with MTX bound to ROWSxCOLUMNS matrix FILLed with data."
+  (call-with-mtx
+   rows columns fill
+   (lambda (mtx)
+     body ...)))
+
 (define (for-mtx thunk mtx)
   "Call THUNK with every (ROW COLUMN VALUE) of MTX."
   (let row-rec ((row 0))
