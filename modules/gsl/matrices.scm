@@ -5,6 +5,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
   #:export (;; Access
+            mtx-parts
+            mtx-data
             mtx-dimensions
             mtx-rows
             mtx-columns
@@ -67,8 +69,13 @@
             ensure-gsl))
 
 ;; Access
+(define (mtx-parts mtx)
+  ;;                        size1  size2  tda    data block owner
+  (parse-c-struct mtx (list size_t size_t size_t '*   '*    int)))
+(define (mtx-data mtx)
+  (fourth (mtx-parts mtx)))
 (define (mtx-dimensions mtx)
-  (parse-c-struct mtx (list size_t size_t)))
+  (take (mtx-parts mtx) 2))
 (define (mtx-rows mtx)
   (first (mtx-dimensions mtx)))
 (define (mtx-columns mtx)

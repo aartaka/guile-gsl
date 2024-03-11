@@ -3,8 +3,10 @@
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
-  #:export (vec-length
-            ;; Accessors
+  #:export (;; Accessors
+            vector-parts
+            vec-length
+            vec-data
             vec-get
             vec-set!
             vec-ptr
@@ -50,8 +52,13 @@
             for-vec))
 
 ;; Access
+(define (vec-parts vec)
+  ;;                        size   stride data block owner
+  (parse-c-struct vec (list size_t size_t '*   '*    int)))
 (define (vec-length vec)
-  (first (parse-c-struct vec (list size_t))))
+  (first (vec-parts vec)))
+(define (vec-data vec)
+  (third (vec-parts vec)))
 
 (define (vec-get vec i)
   ((foreign-fn "gsl_vector_get" `(* ,size_t) double) vec i))
