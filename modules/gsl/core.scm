@@ -70,13 +70,13 @@
      handler))))
 
 ;; (set-error-handler
-;;  (lambda* (#:optional reason file (line 0) (errno -1) #:rest rest)
+;;  (lambda* (#:optional (reason "unknown reason") (file "unknown-file") (line 0) (errno -1) #:rest rest)
 ;;    (let ((error-text
 ;;           (format #f "Error ~d (~a at ~a:~d): ~a"
 ;;                   errno (strerror errno)
-;;                   (if (and file (pointer? file))
+;;                   (if (pointer? file)
 ;;                       (pointer->string file)
-;;                       "unknown-file")
+;;                       file)
 ;;                   line
 ;;                   (if (pointer? reason)
 ;;                       (pointer->string reason)
