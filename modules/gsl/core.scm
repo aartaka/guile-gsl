@@ -74,12 +74,13 @@
 ;;    (let ((error-text
 ;;           (format #f "Error ~d (~a at ~a:~d): ~a"
 ;;                   errno (strerror errno)
-;;                   (if file
+;;                   (if (and file (pointer? file))
 ;;                       (pointer->string file)
 ;;                       "unknown-file")
 ;;                   line
-;;                   (when reason
-;;                     (pointer->string reason)))))
+;;                   (if (pointer? reason)
+;;                       (pointer->string reason)
+;;                       reason))))
 ;;      (display error-text)
 ;;      (newline)
 ;;      (error error-text))))
