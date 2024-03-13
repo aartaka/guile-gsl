@@ -53,17 +53,26 @@
 
 ;; Access
 (define (vec-parts vec)
-  ;;                        size   stride data block owner
+  "Return VEC structure parts:
+- size (int)
+- stride (int)
+- data (pointer)
+- block (pointer)
+- and owner (int)"
   (parse-c-struct vec (list size_t size_t '*   '*    int)))
 (define (vec-length vec)
+  "Number of elements in VEC."
   (first (vec-parts vec)))
 (define (vec-data vec)
+  "Pointer the the actual data (double numbers) residing in VEC."
   (third (vec-parts vec)))
 
 (define (vec-get vec i)
+  "Get I-th element VEC."
   ((foreign-fn "gsl_vector_get" `(* ,size_t) double) vec i))
 
 (define (vec-set! vec i val)
+  "Set I-th element in VEC to VAL."
   ((foreign-fn "gsl_vector_set" `(* ,size_t ,double) void) vec i val))
 
 (define (vec-ptr vec i)
@@ -94,11 +103,13 @@ FILL might be one of:
         (error "Don't know how to fill a vector with" fill))))
     vec))
 (define vec-calloc
+  "Allocate a 0-initialized vector of size SIZE"
   (foreign-fn "gsl_vector_calloc" (list size_t) '*))
 (define vec-free
   (foreign-fn "gsl_vector_free" '(*) void))
 
 (define (vec-fill! vec fill)
+  "Fill the VEC with FILL, a number."
   ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
    vec fill))
 
@@ -113,15 +124,19 @@ FILL might be one of:
       (vec-set! dest idx (vec-get src idx))
       (rec (1+ idx)))))
 (define (vec-copy src)
+  "Non-destructive version of `vec-copy!'.
+Creates a new vector, copies SRC to it, and returns it."
   (let ((new-vec (vec-alloc (vec-length src))))
     (vec-copy! src new-vec)
     new-vec))
 
 (define (vec-swap! a b)
+  "Exchange the values between A and B (vectors)."
   ((foreign-fn "gsl_vector_swap" '(* *) int)
    a b))
 
 (define (vec->vector vec)
+  "Convert VEC to a Scheme vector."
   (vector-unfold (lambda (idx) (vec-get vec idx))
                  (vec-length vec)))
 
@@ -187,6 +202,8 @@ FILL might be one of:
 
 ;; TODO: call-with-vec-copy
 (define (call-with-vec size fill thunk)
+  "Call THUNK with a new SIZE-d vector FILLed with data.
+Free the vector afterwards."
   (let* ((vec (vec-alloc size fill))
          (result (thunk vec)))
     (vec-free vec)

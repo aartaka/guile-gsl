@@ -70,11 +70,19 @@
 
 ;; Access
 (define (mtx-parts mtx)
-  ;;                        size1  size2  tda    data block owner
+  "Return parts of MTX struct:
+- rows (int)
+- columns (int)
+- tda??? (int)
+- data (pointer)
+- block (pointer)
+- owner (int)"
   (parse-c-struct mtx (list size_t size_t size_t '*   '*    int)))
 (define (mtx-data mtx)
+  "Return raw MTX data array (of doubles) pointer."
   (fourth (mtx-parts mtx)))
 (define (mtx-dimensions mtx)
+  "Return a list of (ROWS COLUMNS) in MTX."
   (take (mtx-parts mtx) 2))
 (define (mtx-rows mtx)
   (first (mtx-dimensions mtx)))
@@ -88,6 +96,7 @@
   ((foreign-fn "gsl_matrix_set" `(* ,size_t ,size_t ,double) void)
    mtx row column val))
 (define (mtx-ptr mtx row column)
+  "Return a pointer to [ROW][COLUMN]-th element of MTX."
   ((foreign-fn "gsl_matrix_ptr" `(* ,size_t ,size_t) '*)
    mtx row column))
 
@@ -97,7 +106,8 @@
 FILL might be one of:
 - #f for uninitialized matrix (garbage values, use `mtx-calloc' for
   zero-initialized or numeric FILL for constant-initialized matrices).
-- Real number to fill the vector with the same double value."
+- Real number to fill the matrix with the same double value.
+- Or a list/vector or lists/vectors with numbers to fill in."
   (let ((mtx ((foreign-fn "gsl_matrix_alloc" (list size_t size_t) '*)
               rows columns)))
     (when fill
@@ -119,6 +129,7 @@ FILL might be one of:
         (error "Don't know how to fill a matrix with" fill))))
     mtx))
 (define mtx-calloc
+  "Allocate a new matrix of ROWxCOLUMNS initialized to 0."
   (foreign-fn "gsl_matrix_calloc" (list size_t size_t) '*))
 (define mtx-free
   (foreign-fn "gsl_matrix_free" '(*) void))
@@ -140,11 +151,13 @@ FILL might be one of:
           (column-rec (1+ column))))
       (row-rec (1+ row)))))
 (define (mtx-copy src)
+  "Non-destructive version of `mtx-copy~', returns a new matrix like SRC."
   (let ((new-mtx (mtx-alloc (mtx-rows src) (mtx-columns src))))
     (mtx-copy! src new-mtx)
     new-mtx))
 
 (define (mtx->2d-vector mtx)
+  "Convert MTX to a Scheme vector of vectors of numbers."
   (vector-unfold
    (lambda (row)
      (vector-unfold
@@ -191,16 +204,20 @@ FILL might be one of:
 ;; Destructive matrix<->vector copying.
 
 (define (mtx-row->vec! mtx row vec)
+  "Copy the ROW-th row of MTX to VEC."
   ((foreign-fn "gsl_matrix_get_row" `(* * ,size_t) int)
    vec mtx row))
 (define (mtx-column->vec! mtx column vec)
+  "Copy the COLUMN-th column of MTX to VEC."
   ((foreign-fn "gsl_matrix_get_col" `(* * ,size_t) int)
    vec mtx column))
 
 (define (vec->mtx-row! vec mtx row)
+  "Copy the VEC to ROW-th row of MTX."
   ((foreign-fn "gsl_matrix_set_row" `(* ,size_t *))
    mtx row vec))
 (define (vec->mtx-column! vec mtx column)
+  "Copy the VEC to COLUMN-th column of MTX."
   ((foreign-fn "gsl_matrix_set_col" `(* ,size_t *))
    mtx column vec))
 
@@ -266,6 +283,8 @@ DEST might be one of:
 
 ;; TODO: call-with-mtx-copy
 (define (call-with-mtx rows columns fill thunk)
+  "Call THUNK on a new ROWxCOLUMNS FILL-ed matrix.
+Free the matrix afterwards."
   (let* ((mtx (mtx-alloc rows columns fill))
          (result (thunk mtx)))
     (mtx-free mtx)
@@ -289,6 +308,10 @@ DEST might be one of:
       (row-rec (1+ row)))))
 
 (define (ensure-gsl thing)
+  "Turn THING into a GSL-friendly object:
+- Pointer: do nothing.
+- Vector/list of numbers: turn into a gsl_vector.
+- Vector/list of vectors/lists: turn into a gsl_matrix."
   (cond
    ((pointer? thing)
     thing)
