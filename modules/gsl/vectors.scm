@@ -150,9 +150,9 @@ Creates a new vector, copies SRC to it, and returns it."
 
 (define vec-sum (foreign-fn "gsl_vector_sum" '(*) double))
 (define vec-min (foreign-fn "gsl_vector_min" '(*) double))
-(define vec-min-index (foreign-fn "gsl_vector_min_index" '(*) double))
+(define vec-min-index (foreign-fn "gsl_vector_min_index" '(*) size_t))
 (define vec-max (foreign-fn "gsl_vector_max" '(*) double))
-(define vec-max-index (foreign-fn "gsl_vector_max_index" '(*) double))
+(define vec-max-index (foreign-fn "gsl_vector_max_index" '(*) size_t))
 
 ;; TODO: Views (segfault on my machine)
 
