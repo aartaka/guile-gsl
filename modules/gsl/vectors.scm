@@ -171,13 +171,7 @@ Creates a new vector, copies SRC to it, and returns it."
 (define vec-divide! (foreign-fn "gsl_vector_div" '(* *) int))
 (define vec-divide (act-on-copy vec-divide!))
 
-;; FIXME: The naive implementation kills the process silently.
-;; (define vec-scale! (foreign-fn "gsl_vector_scale" `(* ,double) int))
-(define (vec-scale! vec scalar)
-  (let rec ((idx 0))
-    (when (< idx (vec-length vec))
-      (vec-set! vec idx (* scalar (vec-get vec idx)))
-      (rec (1+ idx)))))
+(define vec-scale! (foreign-fn "gsl_vector_scale" `(* ,double) int))
 (define vec-scale (act-on-copy vec-scale!))
 
 (define vec-add-constant! (foreign-fn "gsl_vector_add_constant" `(* ,double) int))
