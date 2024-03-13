@@ -128,9 +128,10 @@ FILL might be one of:
        (else
         (error "Don't know how to fill a matrix with" fill))))
     mtx))
-(define mtx-calloc
+(define (mtx-calloc row columns)
   "Allocate a new matrix of ROWxCOLUMNS initialized to 0."
-  (foreign-fn "gsl_matrix_calloc" (list size_t size_t) '*))
+  ((foreign-fn "gsl_matrix_calloc" (list size_t size_t) '*)
+   row columns))
 (define mtx-free
   (foreign-fn "gsl_matrix_free" '(*) void))
 
@@ -138,23 +139,20 @@ FILL might be one of:
   ((foreign-fn "gsl_matrix_set_all" `(* ,double) void)
    mtx fill))
 
-(define (mtx-copy! src dest)
-  ;; FIXME: This implementation kills the process.
-  ;; ((foreign-fn "gsl_matrix_memcpy" '(* *) int)
-  ;;  dest src)
-  (let row-rec ((row 0))
-    (when (< row (mtx-rows src))
-      (let column-rec ((column 0))
-        (when (< column (mtx-columns src))
-          (mtx-set! dest row column
-                    (mtx-get src row column))
-          (column-rec (1+ column))))
-      (row-rec (1+ row)))))
-(define (mtx-copy src)
-  "Non-destructive version of `mtx-copy~', returns a new matrix like SRC."
-  (let ((new-mtx (mtx-alloc (mtx-rows src) (mtx-columns src))))
-    (mtx-copy! src new-mtx)
-    new-mtx))
+(define* (mtx-copy! src #:optional (dest #t))
+  "Copy the SRC matrix to DEST.
+DEST can be one of:
+- #t to create a new matrix.
+- Pointer to copy the SRC into it."
+  (let ((real-dest (cond
+                    ((eq? #t dest)
+                     (mtx-alloc (mtx-rows src) (mtx-columns src)))
+                    ((pointer? dest)
+                     dest)
+                    (else
+                     (error "Cannot copy the matrix into " dest)))))
+    ((foreign-fn "gsl_matrix_memcpy" '(* *) int)
+     real-dest src)))
 
 (define (mtx->2d-vector mtx)
   "Convert MTX to a Scheme vector of vectors of numbers."
@@ -236,16 +234,8 @@ DEST might be one of:
                                          (error "Cannot transpose a non-square matrix in place!")))
                     ((pointer? dest) dest)
                     (else (error "Cannot copy transposed matrix into " dest)))))
-    (let row-rec ((row 0))
-      (when (< row (mtx-rows mtx))
-        (let column-rec ((column 0))
-          (when (< column (mtx-columns mtx))
-            (mtx-set! real-dest column row (mtx-get mtx row column))
-            (column-rec (1+ column))))
-        (row-rec (1+ row))))
-    ;; FIXME: Segfaults.
-    ;; ((foreign-fn "gsl_matrix_transpose_memcpy" '(* *) int)
-    ;;  real-dest mtx)
+    ((foreign-fn "gsl_matrix_transpose_memcpy" '(* *) int)
+     real-dest mtx)
     real-dest))
 
 ;; Math operations

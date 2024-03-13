@@ -114,15 +114,8 @@ FILL might be one of:
    vec fill))
 
 (define (vec-copy! src dest)
-  ;; FIXME: This is the right implementation, but it kills the process
-  ;; without any indication of what went wrong.
-  ;;
-  ;; ((foreign-fn "gsl_vector_memcpy" '(* *) int)
-  ;;  dest src)
-  (let rec ((idx 0))
-    (when (< idx (vec-length src))
-      (vec-set! dest idx (vec-get src idx))
-      (rec (1+ idx)))))
+  ((foreign-fn "gsl_vector_memcpy" '(* *) int)
+   dest src))
 (define (vec-copy src)
   "Non-destructive version of `vec-copy!'.
 Creates a new vector, copies SRC to it, and returns it."
