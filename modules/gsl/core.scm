@@ -9,8 +9,10 @@
             sequence-length
             for-sequence))
 
+(define libgsl (load-foreign-library "libgslcblas.so" #:global? #t))
+;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgslcblas.so" #:global? #t))
 (define libgsl (load-foreign-library "libgsl.so"))
-;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
+;;(define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
 
 (define (1+ x)
   (+ 1 x))
