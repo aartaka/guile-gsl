@@ -197,8 +197,6 @@ DEST can be one of:
 ;; FIXME: Segfaults.
 ;; (define mtx-norm1 (foreign-fn "gsl_matrix_norm1" '(*) double))
 
-;; TODO: Views
-
 ;; Destructive matrix<->vector copying.
 
 (define (mtx-row->vec! mtx row vec)

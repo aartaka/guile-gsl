@@ -30,10 +30,6 @@
             vec-min-index
             vec-max
             vec-max-index
-            ;; Views
-            vec-view
-            vec-view-reals
-            vec-view-imags
             ;; Ops
             vec-add!
             vec-add
@@ -153,8 +149,6 @@ Creates a new vector, copies SRC to it, and returns it."
 (define vec-min-index (foreign-fn "gsl_vector_min_index" '(*) size_t))
 (define vec-max (foreign-fn "gsl_vector_max" '(*) double))
 (define vec-max-index (foreign-fn "gsl_vector_max_index" '(*) size_t))
-
-;; TODO: Views (segfault on my machine)
 
 ;; Operations
 
