@@ -194,8 +194,7 @@ DEST can be one of:
      mtx row column)
     (append (parse-c-struct row (list size_t))
             (parse-c-struct column (list size_t)))))
-;; FIXME: Segfaults.
-;; (define mtx-norm1 (foreign-fn "gsl_matrix_norm1" '(*) double))
+(define mtx-norm1 (foreign-fn "gsl_matrix_norm1" '(*) double))
 
 ;; Destructive matrix<->vector copying.
 
