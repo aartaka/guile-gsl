@@ -102,9 +102,9 @@ FILL might be one of:
        (else
         (error "Don't know how to fill a vector with" fill))))
     vec))
-(define vec-calloc
+(define (vec-calloc size)
   "Allocate a 0-initialized vector of size SIZE"
-  (foreign-fn "gsl_vector_calloc" (list size_t) '*))
+  ((foreign-fn "gsl_vector_calloc" (list size_t) '*) size))
 (define vec-free
   (foreign-fn "gsl_vector_free" '(*) void))
 
