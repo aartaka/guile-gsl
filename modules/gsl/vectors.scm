@@ -16,7 +16,7 @@
             vec-free
             vec-copy!
             vec-copy
-            vect-fill!
+            vec-fill!
             vec->vector
             ;; Predicates
             vec-null?
