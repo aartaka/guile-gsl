@@ -1,4 +1,4 @@
-;; Run with
+;; Runnable from the repository root directory with
 ;; guile --debug -L . test/test.scm
 (define-module (lmdb tests)
   #:use-module (srfi srfi-64)
