@@ -152,7 +152,8 @@ DEST can be one of:
                     (else
                      (error "Cannot copy the matrix into " dest)))))
     ((foreign-fn "gsl_matrix_memcpy" '(* *) int)
-     real-dest src)))
+     real-dest src)
+    real-dest))
 
 (define (mtx->2d-vector mtx)
   "Convert MTX to a Scheme vector of vectors of numbers."

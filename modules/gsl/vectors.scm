@@ -122,7 +122,8 @@ DEST can be one of:
                     (else
                      (error "Cannot copy the matrix into " dest)))))
     ((foreign-fn "gsl_vector_memcpy" '(* *) int)
-     real-dest src)))
+     real-dest src)
+    real-dest))
 
 (define (vec-swap! a b)
   "Exchange the values between A and B (vectors)."
