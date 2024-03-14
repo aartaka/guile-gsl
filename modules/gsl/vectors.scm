@@ -15,7 +15,6 @@
             vec-calloc
             vec-free
             vec-copy!
-            vec-copy
             vec-fill!
             vec->vector
             ;; Predicates
@@ -111,14 +110,19 @@ FILL might be one of:
    vec fill))
 
 (define (vec-copy! src dest)
-  ((foreign-fn "gsl_vector_memcpy" '(* *) int)
-   dest src))
-(define (vec-copy src)
-  "Non-destructive version of `vec-copy!'.
-Creates a new vector, copies SRC to it, and returns it."
-  (let ((new-vec (vec-alloc (vec-length src))))
-    (vec-copy! src new-vec)
-    new-vec))
+  "Copy the SRC vector to DEST.
+DEST can be one of:
+- #t to create a new vector.
+- Pointer to copy SRC into it."
+  (let ((real-dest (cond
+                    ((eq? #t dest)
+                     (vec-alloc (vec-length src)))
+                    ((pointer? dest)
+                     dest)
+                    (else
+                     (error "Cannot copy the matrix into " dest)))))
+    ((foreign-fn "gsl_vector_memcpy" '(* *) int)
+     real-dest src)))
 
 (define (vec-swap! a b)
   "Exchange the values between A and B (vectors)."

@@ -34,7 +34,7 @@
 (define vec3-copy1 (vec-alloc 3))
 (vec-copy! vec3 vec3-copy1)
 (test-eqv 3.0 (vec-get vec3-copy1 2))
-(define vec3-copy2 (vec-copy vec3))
+(define vec3-copy2 (vec-copy! vec3))
 (test-eqv 3.0 (vec-get vec3-copy2 2))
 ;; Vector callocation
 (define vec-calloc-ed (vec-calloc 8))
