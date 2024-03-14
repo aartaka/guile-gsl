@@ -3,7 +3,6 @@
   #:use-module (system foreign-library)
   #:use-module (system foreign-object)
   #:export (foreign-fn
-            1+
             make-c-ptr
             sequence?
             sequence-ref
@@ -14,9 +13,6 @@
 ;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgslcblas.so" #:global? #t))
 (define libgsl (load-foreign-library "libgsl.so"))
 ;;(define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
-
-(define (1+ x)
-  (+ 1 x))
 
 (define (sequence? seq)
   (or (list? seq)

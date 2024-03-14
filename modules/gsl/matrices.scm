@@ -291,8 +291,8 @@ Free the matrix afterwards."
       (let column-rec ((column 0))
         (when (< column (mtx-columns mtx))
           (thunk row column (mtx-get mtx row column))
-          (column-rec (1+ column))))
-      (row-rec (1+ row)))))
+          (column-rec (+ 1 column))))
+      (row-rec (+ 1 row)))))
 
 (define (ensure-gsl thing)
   "Turn THING into a GSL-friendly object:

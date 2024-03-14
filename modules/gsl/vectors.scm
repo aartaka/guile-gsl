@@ -207,4 +207,4 @@ Free the vector afterwards."
   (let for ((idx 0))
     (when (< idx (vec-length vec))
       (thunk idx (vec-get vec idx))
-      (for (1+ idx)))))
+      (for (+ 1 idx)))))
