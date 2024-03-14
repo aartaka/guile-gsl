@@ -61,13 +61,18 @@
 (vec-add! vec3-copy1 vec3-copy2)
 (test-assert (vec-equal? vec3-copy2 vec3))
 (test-assert (not (vec-equal? vec3-copy1 vec3)))
+;; vec3-copy1 is #(2.0 -4.0 6.0)
 (vec-scale! vec3-copy2 2)
+;; vec3-copy2 is doubled too
 (test-assert (vec-equal? vec3-copy1 vec3-copy2))
 (vec-subtract! vec3-copy1 vec3)
+;; vec3-copy1 is #(1.0 -2.0 3.0) back again
 (test-assert (vec-equal? vec3-copy1 vec3))
 (vec-divide! vec3-copy1 vec3)
+;; vec3-copy1 is #(1.0 1.0 1.0)
 (test-eqv 1.0 (vec-get vec3-copy1 0))
 (vec-add-constant! vec3-copy1 2)
+;; vec3-copy1 is #(3.0 3.0 3.0)
 (test-eqv 3.0 (vec-get vec3-copy1 0))
 (test-end "vector-ops")
 
