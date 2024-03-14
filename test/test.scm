@@ -71,8 +71,32 @@
 (test-eqv 3.0 (vec-get vec3-copy1 0))
 (test-end "vector-ops")
 
+(test-begin "matrix-allocation")
+;; Empty matrix
+(define mtx0 (mtx-alloc 0 0 0))
+(test-assert mtx0)
+(test-equal 0 (mtx-rows mtx0) (mtx-columns mtx0))
+(define mtx1 (mtx-alloc 3 3 1.0))
+(test-equal 3 (mtx-rows mtx1) (mtx-columns mtx1))
+(test-eqv 1.0 (mtx-get mtx1 0 0))
+;; Sequence-filled matrix
+(define mtx2 (mtx-alloc 3 3 #(#(1 2 3)
+                              (4)
+                              #(1 2))))
+(test-equal 3 (mtx-rows mtx2) (mtx-columns mtx2))
+(test-eqv 4.0 (mtx-get mtx2 1 0))
+;; Calloc-ed
+(define mtx-calloc-ed (mtx-calloc 2 2))
+(test-equal 2 (mtx-rows mtx-calloc-ed) (mtx-columns mtx-calloc-ed))
+(test-eqv 0.0 (mtx-get mtx-calloc-ed 0 1))
+(test-end "matrix-allocation")
+
 (test-begin "cleanup")
-;; Free all vec3
+;; Free all the matrices
+(mtx-free mtx0)
+(mtx-free mtx1)
+(mtx-free mtx2)
+(mtx-free mtx-calloc-ed)
 ;; Free all the vectors
 (vec-free vec0)
 (vec-free vec1)
