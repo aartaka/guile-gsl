@@ -31,6 +31,7 @@
             mtx-min-index
             mtx-max
             mtx-max-index
+            mtx-norm1
             ;; Views
             mtx-row
             mtx-column
