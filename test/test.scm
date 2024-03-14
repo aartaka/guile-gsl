@@ -43,7 +43,7 @@
 (test-eqv 0.0 (vec-get vec-calloc-ed 7))
 (test-end "vector-allocation")
 
-(test-begin "aggregation")
+(test-begin "vector-aggregation")
 ;; Predicates
 (test-assert (vec-null? vec-calloc-ed))
 (test-assert (vec-non-negative? vec1))
@@ -55,7 +55,7 @@
 (test-eqv 2 (vec-max-index vec3))
 (test-eqv -2.0 (vec-min vec3))
 (test-eqv 1 (vec-min-index vec3))
-(test-end "aggregation")
+(test-end "vector-aggregation")
 
 (test-begin "vector-ops")
 (vec-add! vec3-copy1 vec3-copy2)
