@@ -109,7 +109,7 @@ FILL might be one of:
   ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
    vec fill))
 
-(define (vec-copy! src dest)
+(define* (vec-copy! src #:optional (dest #t))
   "Copy the SRC vector to DEST.
 DEST can be one of:
 - #t to create a new vector.
