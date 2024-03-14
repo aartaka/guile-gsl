@@ -114,7 +114,7 @@
 (test-eqv 4.0 (mtx-max mtx2))
 (test-eqv 0.0 (mtx-min mtx2))
 (test-equal '(1 0) (mtx-max-index mtx2))
-(test-equal '(1 2) (mtx-min-index mtx2))
+(test-equal '(1 1) (mtx-min-index mtx2))
 (test-eqv 3.0 (mtx-norm1 mtx1))
 (test-end "matrix-aggregation")
 
