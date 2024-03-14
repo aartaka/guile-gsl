@@ -10,8 +10,8 @@
 
 (test-begin "vector-allocation")
 ;; Empty vector
-(define vec (vec-alloc 0))
-(test-eqv 0 (vec-length vec))
+(define vec0 (vec-alloc 0))
+(test-eqv 0 (vec-length vec0))
 ;; Regular garbage-initialized
 (define vec1 (vec-alloc 10))
 (test-eqv 10 (vec-length vec1))
@@ -73,6 +73,9 @@
 
 (test-begin "cleanup")
 ;; Free all vec3
+;; Free all the vectors
+(vec-free vec0)
+(vec-free vec1)
 (vec-free vec2)
 (vec-free vec3-copy2)
 (vec-free vec3-copy1)
