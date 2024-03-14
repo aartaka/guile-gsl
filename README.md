@@ -12,42 +12,50 @@ definition is already provided) and start the REPL.
 Here's a BLAS example from the GSL docs, adjusted to Scheme:
 
 ``` scheme
-(use-modules (gsl matrices))
-(use-modules (gsl blas))
-(let ((a (mtx-alloc 2 3 #(#(0.11 0.12 0.13)
+(use-modules ((gsl matrices) #:prefix mtx:))
+(use-modules ((gsl blas) #:prefix blas:))
+(let ((a (mtx:alloc 2 3 #(#(0.11 0.12 0.13)
                           #(0.21 0.22 0.23))))
-      (b (mtx-alloc 3 2 #(#(1011 1012)
+      (b (mtx:alloc 3 2 #(#(1011 1012)
                           #(1021 1022)
                           #(1031 1032))))
-      (result (mtx-alloc 2 2 0)))
-  (dgemm! a b result #:beta 0)
-  (mtx->2d-vector result))
+      (result (mtx:alloc 2 2 0)))
+  (blas:dgemm! a b result #:beta 0)
+  (mtx:->2d-vector result))
 ;;; $1 = #(#(367.76 368.12) #(674.0600000000001 674.72))
 ```
 
 ## Names & How to Use The Library
 
-Most bindings follow the GSL names, except for `gsl_` prefix being dropped and area prefixes shortened:
-- Vector functions start with `vec-`
-- Matrix functions start with `mtx-`
-- BLAS functions are not prefixed with anything due to their *unique*
-  naming conventions.
+Most bindings follow the GSL names, except that
+- `gsl_` prefix and area prefix are dropped.
+- Destructive operations have an exclamation mark after the name. 
+- Copying counterparts to the destructive operations don't have an
+  exclamation mark.
+- Transformation/conversion operations start with `->`.
+- Some operations are renamed to better fit Scheme conventions.
 
-Notice that area prefixes might be dropped at some moment. But, even
-so, you can use the old names by `use-modules`-ing with custom prefix:
+To exemplify:
+- `gsl_vector_alloc` is mere `alloc` in `(gsl vectors)`.
+- `gsl_matrix_set` is `set!` in `(gsl matrices)`.
+- `gsl_matrix_set_all` is `fill!` in `(gsl matrices)`.
+
+Notice that this extremely succinct naming means that many symbols in
+the programs one writes (or even in standard Scheme, like `set!`) are
+doomed to collide with the names provided by this library. Thus, use
+the provided modules with suitable prefixes instead of importing them
+raw:
 
 ``` scheme
-(use-modules ((gsl matrices) #:prefix mtx-))
-(use-modules ((gsl vectors) #:prefix vec-))
+(use-modules ((gsl matrices) #:prefix mtx:))
+(use-modules ((gsl vectors) #:prefix vec:))
+(use-modules ((gsl blas) #:prefix blas:))
 ```
-
-Destructive operations (all of BLAS and some operations for vectors
-and matrices) are suffixed with `!`, as customary in Scheme.
 
 Overall, you're best served by interactive help facilities Guile
 provides:
 ``` scheme
-> ,describe mtx-alloc
+> ,describe mtx:alloc
 Create a new ROWSxCOLUMNS gsl_matrix.
 FILL might be one of:
 - #f for uninitialized matrix (garbage values, use `mtx-calloc' for

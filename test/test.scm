@@ -3,8 +3,8 @@
 (define-module (lmdb tests)
   #:use-module (srfi srfi-64)
   #:use-module (system foreign)
-  #:use-module (gsl vectors)
-  #:use-module (gsl matrices)
+  #:use-module ((gsl vectors) #:prefix vec-)
+  #:use-module ((gsl matrices) #:prefix mtx-)
   #:use-module (gsl blas)
   #:use-module (gsl stat))
 
@@ -120,10 +120,10 @@
 
 (test-begin "matrix-vector")
 ;; Vector to matrix
-(vec->mtx-row! vec3 mtx2-copy1 0)
+(mtx-vec->row! vec3 mtx2-copy1 0)
 ;; mtx2-copy1 is ((1 -2 3) ...)
 (test-eqv -2.0 (mtx-get mtx2-copy1 0 1))
-(vec->mtx-column! vec3-copy1 mtx2-copy1 0)
+(mtx-vec->column! vec3-copy1 mtx2-copy1 0)
 ;; mtx2-copy1 is ((3 -2 3) (3 ...) (3 ...))
 (test-eqv 3.0 (mtx-get mtx2-copy1 1 0))
 ;; Matrix to vector
