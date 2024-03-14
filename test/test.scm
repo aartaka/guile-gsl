@@ -81,21 +81,45 @@
 (test-eqv 1.0 (mtx-get mtx1 0 0))
 ;; Sequence-filled matrix
 (define mtx2 (mtx-alloc 3 3 #(#(1 2 3)
-                              (4)
-                              #(1 2))))
+                              (4 0 1)
+                              #(1 0 2))))
 (test-equal 3 (mtx-rows mtx2) (mtx-columns mtx2))
 (test-eqv 4.0 (mtx-get mtx2 1 0))
+;; Copying
+(define mtx2-copy1 (mtx-alloc 3 3))
+(mtx-copy! mtx2 mtx2-copy1)
+(test-eqv 1.0 (mtx-get mtx2-copy1 0 0))
+(define mtx2-copy2 (mtx-copy! mtx2))
+(test-eqv 1.0 (mtx-get mtx2-copy2 0 0))
 ;; Calloc-ed
 (define mtx-calloc-ed (mtx-calloc 2 2))
 (test-equal 2 (mtx-rows mtx-calloc-ed) (mtx-columns mtx-calloc-ed))
 (test-eqv 0.0 (mtx-get mtx-calloc-ed 0 1))
 (test-end "matrix-allocation")
 
+(test-begin "matrix-aggregation")
+;; Predicates
+(test-assert (mtx-null? mtx-calloc-ed))
+(test-assert (mtx-positive? mtx1))
+(test-assert (not (mtx-positive? mtx2)))
+(test-assert (mtx-non-negative? mtx2))
+(test-assert (mtx-equal? mtx2 mtx2-copy1))
+(test-assert (mtx-equal? mtx2 mtx2-copy2))
+;; Aggregation
+(test-eqv 4.0 (mtx-max mtx2))
+(test-eqv 0.0 (mtx-min mtx2))
+(test-equal '(1 0) (mtx-max-index mtx2))
+(test-equal '(1 2) (mtx-min-index mtx2))
+(test-eqv 3.0 (mtx-norm1 mtx1))
+(test-end "matrix-aggregation")
+
 (test-begin "cleanup")
 ;; Free all the matrices
 (mtx-free mtx0)
 (mtx-free mtx1)
 (mtx-free mtx2)
+(mtx-free mtx2-copy1)
+(mtx-free mtx2-copy2)
 (mtx-free mtx-calloc-ed)
 ;; Free all the vectors
 (vec-free vec0)
