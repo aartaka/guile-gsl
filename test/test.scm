@@ -118,6 +118,23 @@
 (test-eqv 3.0 (mtx-norm1 mtx1))
 (test-end "matrix-aggregation")
 
+(test-begin "matrix-vector")
+;; Vector to matrix
+(vec->mtx-row! vec3 mtx2-copy1 0)
+;; mtx2-copy1 is ((1 -2 3) ...)
+(test-eqv -2.0 (mtx-get mtx2-copy1 0 1))
+(vec->mtx-column! vec3-copy1 mtx2-copy1 0)
+;; mtx2-copy1 is ((3 -2 3) (3 ...) (3 ...))
+(test-eqv 3.0 (mtx-get mtx2-copy1 1 0))
+;; Matrix to vector
+(mtx-row->vec! mtx2-copy1 0 vec3-copy1)
+;; vec3-copy1 is #(3 -2 3)
+(test-eqv 3.0 (vec-get vec3-copy1 0))
+(mtx-column->vec! mtx2-copy2 0 vec3-copy2)
+;; vec3-copy2 is #(1 4 1)
+(test-eqv 4.0 (vec-get vec3-copy2 1))
+(test-end "matrix-vector")
+
 (test-begin "cleanup")
 ;; Free all the matrices
 (mtx-free mtx0)
