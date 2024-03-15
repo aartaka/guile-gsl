@@ -12,7 +12,7 @@
 (define libgslcblas (load-foreign-library "libgslcblas.so" #:global? #t))
 ;; (define libgslcblas (load-foreign-library "/home/aartaka/.guix-profile/lib/libgslcblas.so" #:global? #t))
 (define libgsl (load-foreign-library "libgsl.so"))
-;;(define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
+;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
 
 (define (sequence? seq)
   (or (list? seq)
