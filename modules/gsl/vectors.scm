@@ -160,7 +160,7 @@ DEST can be one of:
 (define (act-on-copy op)
   "Wrapper to generate the non-destructive versions of GSL ops."
   (lambda (vec arg)
-    (let ((new (copy vec)))
+    (let ((new (copy! vec)))
       (op new arg)
       new)))
 

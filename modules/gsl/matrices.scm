@@ -18,7 +18,6 @@
             calloc
             free
             copy!
-            copy
             >2d-vector
             ;; Predicates
             null?
@@ -234,7 +233,7 @@ DEST might be one of:
 (define (act-on-copy op)
   "Wrapper to generate the non-destructive versions of GSL ops."
   (lambda (mtx arg)
-    (let ((new (copy mtx)))
+    (let ((new (copy! mtx)))
       (op new arg)
       new)))
 
