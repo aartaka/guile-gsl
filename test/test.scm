@@ -1,6 +1,6 @@
 ;; Runnable from the repository root directory with
 ;; guile --debug -L . test/test.scm
-(define-module (lmdb tests)
+(define-module (gsl tests)
   #:use-module (srfi srfi-64)
   #:use-module (system foreign)
   #:use-module ((gsl vectors) #:prefix vec-)
