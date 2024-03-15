@@ -19,20 +19,21 @@
                                       (const #t))))
     (build-system guile-build-system)
     (arguments
-     '(#:source-directory "modules"
-       #:phases (modify-phases %standard-phases
-                  (add-before 'build 'substitute-gsl-so
-                    (lambda* (#:key inputs #:allow-other-keys)
-                      (let ((gsl (string-append (assoc-ref inputs "gsl")
-                                                "/lib/libgsl.so"))
-                            (gslcblas (string-append (assoc-ref inputs "gsl")
-                                                     "/lib/libgslcblas.so")))
-                        (substitute* '("modules/gsl/core.scm")
-                          (("libgsl.so")
-                           gsl)
-                          (("libgslcblas.so")
-                           gslcblas))
-                        #t))))))
+     (list #:source-directory "modules"
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'build 'substitute-gsl-so
+                 (lambda _
+                   (let ((gsl (string-append #$(this-package-input "gsl")
+                                             "/lib/libgsl.so"))
+                         (gslcblas (string-append #$(this-package-input "gsl")
+                                                  "/lib/libgslcblas.so")))
+                     (substitute* '("modules/gsl/core.scm")
+                       (("libgsl.so")
+                        gsl)
+                       (("libgslcblas.so")
+                        gslcblas))
+                     #t))))))
     (native-inputs (list guile-3.0))
     (inputs (list guile-3.0 gsl))
     (home-page "https://github.com/aartaka/guile-gsl")
