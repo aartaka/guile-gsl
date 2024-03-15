@@ -18,7 +18,7 @@
             calloc
             free
             copy!
-            >2d-vector
+            ->2d-vector
             ;; Predicates
             null?
             positive?
@@ -258,7 +258,7 @@ DEST might be one of:
 (define scale-rows! (foreign-fn "gsl_matrix_scale_rows" '(* *) int))
 (define scale-rows (act-on-copy scale-rows!))
 
-(define add-constant! (foreign-fn "gsl_matrix_add_constant" '(* *) int))
+(define add-constant! (foreign-fn "gsl_matrix_add_constant" `(* ,double) int))
 (define add-constant (act-on-copy add-constant!))
 
 ;; TODO: call-with-copy
