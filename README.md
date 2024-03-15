@@ -29,9 +29,15 @@ Here's a BLAS example from the GSL docs, adjusted to Scheme:
 
 Most bindings follow the GSL names, except that
 - `gsl_` prefix and area prefix are dropped.
-- Destructive operations have an exclamation mark after the name. 
-- Copying counterparts to the destructive operations don't have an
-  exclamation mark.
+  - Area prefixes are modules now:
+    - `(gsl vectors)` for vector ops.
+    - `(gsl matrices)` for matrices.
+    - `(gsl blas)` for BLAS compatibility.
+    - `(gsl stat)` for statistics.
+- Destructive operations have an exclamation mark (`!`) after the
+  name.
+- Copying counterparts to the destructive operations (or otherwise
+  "safe" operations) don't have an exclamation mark.
 - Transformation/conversion operations start with `->`.
 - Some operations are renamed to better fit Scheme conventions.
 
@@ -39,6 +45,7 @@ To exemplify:
 - `gsl_vector_alloc` is mere `alloc` in `(gsl vectors)`.
 - `gsl_matrix_set` is `set!` in `(gsl matrices)`.
 - `gsl_matrix_set_all` is `fill!` in `(gsl matrices)`.
+- Conversion from `gsl_vector` to Scheme vector is `(gsl vectors) ->vector`
 
 Notice that this extremely succinct naming means that many symbols in
 the programs one writes (or even in standard Scheme, like `set!`) are
