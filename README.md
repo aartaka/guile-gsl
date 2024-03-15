@@ -65,9 +65,10 @@ provides:
 > ,describe mtx:alloc
 Create a new ROWSxCOLUMNS gsl_matrix.
 FILL might be one of:
-- #f for uninitialized matrix (garbage values, use `mtx-calloc' for
+- #f for uninitialized matrix (garbage values, use `calloc' for
   zero-initialized or numeric FILL for constant-initialized matrices).
 - Real number to fill the matrix with the same double value.
+- Or a list/vector or lists/vectors with numbers to fill in.
 > ,apropos dgemm
 (gsl blas): dgemm!	#<procedure dgemm! (amtx bmtx cmtx #:key alpha beta transpose-a transpose-b)>
 ```
