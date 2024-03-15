@@ -134,7 +134,7 @@ FILL might be one of:
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC matrix to DEST.
 DEST can be one of:
-- #t to create a new matrix.
+- #t to create a new matrix (default).
 - Pointer to copy the SRC into it."
   (let ((real-dest (cond
                     ((eq? #t dest)

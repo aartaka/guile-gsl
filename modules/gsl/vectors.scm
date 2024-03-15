@@ -112,7 +112,7 @@ FILL might be one of:
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC vector to DEST.
 DEST can be one of:
-- #t to create a new vector.
+- #t to create a new vector (default).
 - Pointer to copy SRC into it."
   (let ((real-dest (cond
                     ((eq? #t dest)
