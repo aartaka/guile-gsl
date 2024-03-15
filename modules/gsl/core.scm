@@ -75,7 +75,7 @@ according to GSL docs, but is unreliable in practice."
      handler))))
 
 ;; (set-error-handler
-;;  (lambda* (#:optional (reason "unknown reason") (file "unknown-file") (line 0) (errno -1) #:rest rest)
+;;  (lambda* (#:optional (reason "unknown reason") (file "unknown-file") (line -1) (errno -1) #:rest rest)
 ;;    (let ((error-text
 ;;           (format #f "Error ~d (~a at ~a:~d): ~a"
 ;;                   errno (strerror errno)
