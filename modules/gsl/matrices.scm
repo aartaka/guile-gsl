@@ -11,6 +11,7 @@
             rows
             columns
             get
+            ref
             set!
             ptr
             ;; (De)allocation
@@ -58,6 +59,7 @@
             ;; Helpers
             call-with-mtx
             for-mtx
+            for-each
             ensure-gsl))
 
 ;; Access
@@ -84,6 +86,7 @@
 (define (get mtx row column)
   ((foreign-fn "gsl_matrix_get" `(* ,size_t ,size_t) double)
    mtx row column))
+(define ref get)
 (define (set! mtx row column val)
   ((foreign-fn "gsl_matrix_set" `(* ,size_t ,size_t ,double) void)
    mtx row column val))
@@ -279,6 +282,7 @@ Free the matrix afterwards."
           (thunk row column (get mtx row column))
           (column-rec (+ 1 column))))
       (row-rec (+ 1 row)))))
+(define for-each for-mtx)
 
 (define (ensure-gsl thing)
   "Turn THING into a GSL-friendly object:

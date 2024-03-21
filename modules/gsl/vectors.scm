@@ -8,6 +8,7 @@
             length
             data
             get
+            ref
             set!
             ptr
             ;; (De)allocation
@@ -45,7 +46,8 @@
             axpby!
             ;; Utils
             call-with-vec
-            for-vec))
+            for-vec
+            for-each))
 
 ;; Access
 (define (parts vec)
@@ -66,6 +68,7 @@
 (define (get vec i)
   "Get I-th element VEC."
   ((foreign-fn "gsl_vector_get" `(* ,size_t) double) vec i))
+(define ref get)
 
 (define (set! vec i val)
   "Set I-th element in VEC to VAL."
@@ -202,3 +205,5 @@ Free the vector afterwards."
     (when (< idx (length vec))
       (thunk idx (get vec idx))
       (for (+ 1 idx)))))
+
+(define for-each for-vec)
