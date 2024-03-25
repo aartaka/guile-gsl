@@ -13,6 +13,7 @@
             ptr
             ;; (De)allocation
             alloc
+            make
             calloc
             free
             copy!
@@ -101,6 +102,7 @@ FILL might be one of:
        (else
         (error "Don't know how to fill a vector with" fill))))
     vec))
+(define make alloc)
 (define (calloc size)
   "Allocate a 0-initialized vector of size SIZE"
   ((foreign-fn "gsl_vector_calloc" (list size_t) '*) size))

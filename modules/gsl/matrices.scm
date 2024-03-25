@@ -16,6 +16,7 @@
             ptr
             ;; (De)allocation
             alloc
+            make
             calloc
             free
             copy!
@@ -123,6 +124,7 @@ FILL might be one of:
        (else
         (error "Don't know how to fill a matrix with" fill))))
     mtx))
+(define make alloc)
 (define (calloc row columns)
   "Allocate a new matrix of ROWxCOLUMNS initialized to 0."
   ((foreign-fn "gsl_matrix_calloc" (list size_t size_t) '*)
