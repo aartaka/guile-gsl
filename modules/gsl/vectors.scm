@@ -3,7 +3,7 @@
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
-  #:export-syntax (with-vec)
+  #:export-syntax (with)
   #:export ( ;; Accessors
             parts
             length
@@ -202,7 +202,7 @@ Free the vector afterwards."
     (free vec)
     result))
 
-(define-syntax-rule (with-vec (vec size fill) body ...)
+(define-syntax-rule (with (vec size fill) body ...)
   "Run BODY with VEC bound to SIZE-d vector FILLed with data."
   (call-with-vec
    size fill

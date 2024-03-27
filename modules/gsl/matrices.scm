@@ -4,7 +4,7 @@
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
-  #:export-syntax (with-mtx)
+  #:export-syntax (with)
   #:export ( ;; Access
             parts
             data
@@ -276,7 +276,7 @@ Free the matrix afterwards."
     (free mtx)
     result))
 
-(define-syntax-rule (with-mtx (mtx rows columns fill) body ...)
+(define-syntax-rule (with (mtx rows columns fill) body ...)
   "Run BODY with MTX bound to ROWSxCOLUMNS matrix FILLed with data."
   (call-with-mtx
    rows columns fill
