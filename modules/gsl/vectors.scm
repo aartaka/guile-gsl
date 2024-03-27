@@ -203,9 +203,8 @@ Free the vector afterwards."
 
 (define (for-vec thunk vec)
   "Call THUNK with (INDEX VALUE) of every element in VEC."
-  (let for ((idx 0))
-    (when (< idx (length vec))
-      (thunk idx (get vec idx))
-      (for (+ 1 idx)))))
+  (do ((idx 0 (1+ idx)))
+      ((= idx (length vec)))
+    (thunk idx (get vec idx))))
 
 (define for-each for-vec)

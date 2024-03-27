@@ -34,16 +34,16 @@
 (define (for-sequence thunk seq)
   "Walk the elements of SEQ (list/vector) calling THUNK on index & value."
   (if (sequence? seq)
-      (let rec ((idx 0))
-        (when (< idx ((if (list? seq)
-                          length
-                          vector-length)
-                      seq))
-          (thunk idx ((if (list? seq)
-                          list-ref
-                          vector-ref)
-                      seq idx))
-          (rec (1+ idx))))
+      (do ((len ((if (list? seq)
+                     length
+                     vector-length)
+                 seq))
+           (idx 0 (1+ idx)))
+          ((= idx len))
+        (thunk idx ((if (list? seq)
+                        list-ref
+                        vector-ref)
+                    seq idx)))
       (error "for-seq called on a non-sequence: " seq)))
 
 (define* (foreign-fn name args #:optional (return-type int))

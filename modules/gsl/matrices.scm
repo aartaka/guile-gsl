@@ -277,13 +277,11 @@ Free the matrix afterwards."
 
 (define (for-mtx thunk mtx)
   "Call THUNK with every (ROW COLUMN VALUE) of MTX."
-  (let row-rec ((row 0))
-    (when (< row (rows mtx))
-      (let column-rec ((column 0))
-        (when (< column (columns mtx))
-          (thunk row column (get mtx row column))
-          (column-rec (+ 1 column))))
-      (row-rec (+ 1 row)))))
+  (do ((row 0 (1+ row)))
+      ((= row (rows mtx)))
+    (do ((column 0 (1+ column)))
+        ((= column (columns mtx)))
+      (thunk row column (get mtx row column)))))
 (define for-each for-mtx)
 
 (define (ensure-gsl thing)
