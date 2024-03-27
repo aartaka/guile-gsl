@@ -3,7 +3,8 @@
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
-  #:export (;; Accessors
+  #:export-syntax (with-vec)
+  #:export ( ;; Accessors
             parts
             length
             data

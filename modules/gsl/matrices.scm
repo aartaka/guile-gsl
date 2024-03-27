@@ -4,7 +4,8 @@
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
-  #:export (;; Access
+  #:export-syntax (with-mtx)
+  #:export ( ;; Access
             parts
             data
             dimensions
