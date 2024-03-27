@@ -297,8 +297,8 @@ Free the matrix afterwards."
    ((and (sequence? thing)
          (sequence? (sequence-ref thing 0)))
     (alloc (sequence-length thing)
-               (sequence-length (sequence-ref thing 0))
-               thing))
+           (sequence-length (sequence-ref thing 0))
+           thing))
    ((sequence? thing)
     (vec-alloc (sequence-length thing) thing))
    (else
