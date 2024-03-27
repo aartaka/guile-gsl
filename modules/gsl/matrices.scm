@@ -275,6 +275,13 @@ Free the matrix afterwards."
     (free mtx)
     result))
 
+(define-syntax-rule (with-mtx (mtx rows columns fill) body ...)
+  "Run BODY with MTX bound to ROWSxCOLUMNS matrix FILLed with data."
+  (call-with-mtx
+   rows columns fill
+   (lambda (mtx)
+     body ...)))
+
 (define (for-mtx thunk mtx)
   "Call THUNK with every (ROW COLUMN VALUE) of MTX."
   (do ((row 0 (1+ row)))

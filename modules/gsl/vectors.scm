@@ -201,6 +201,13 @@ Free the vector afterwards."
     (free vec)
     result))
 
+(define-syntax-rule (with-vec (vec size fill) body ...)
+  "Run BODY with VEC bound to SIZE-d vector FILLed with data."
+  (call-with-vec
+   size fill
+   (lambda (vec)
+     body ...)))
+
 (define (for-vec thunk vec)
   "Call THUNK with (INDEX VALUE) of every element in VEC."
   (do ((idx 0 (1+ idx)))
