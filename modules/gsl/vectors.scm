@@ -59,7 +59,7 @@
 - data (pointer)
 - block (pointer)
 - and owner (int)"
-  (parse-c-struct vec (list size_t size_t '*   '*    int)))
+  (parse-c-struct vec (list size_t size_t '* '* int)))
 (define (length vec)
   "Number of elements in VEC."
   (first (parts vec)))

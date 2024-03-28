@@ -73,7 +73,7 @@
 - data (pointer)
 - block (pointer)
 - owner (int)"
-  (parse-c-struct mtx (list size_t size_t size_t '*   '*    int)))
+  (parse-c-struct mtx (list size_t size_t size_t '* '* int)))
 (define (data mtx)
   "Return raw MTX data array (of doubles) pointer."
   (fourth (parts mtx)))
