@@ -67,9 +67,10 @@
   "Pointer the the actual data (double numbers) residing in VEC."
   (third (parts vec)))
 
+(define %get (foreign-fn "gsl_vector_get" `(* ,size_t) double))
 (define (get vec i)
   "Get I-th element VEC."
-  ((foreign-fn "gsl_vector_get" `(* ,size_t) double) vec i))
+  (%get vec i))
 (define ref get)
 
 (define (set! vec i val)
@@ -211,8 +212,9 @@ Free the vector afterwards."
 
 (define (for-vec thunk vec)
   "Call THUNK with (INDEX VALUE) of every element in VEC."
-  (do ((idx 0 (1+ idx)))
-      ((= idx (length vec)))
-    (thunk idx (get vec idx))))
+  (let ((len (length vec)))
+    (do ((idx 0 (1+ idx)))
+        ((= idx len))
+      (thunk idx (get vec idx)))))
 
 (define for-each for-vec)

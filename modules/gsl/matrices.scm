@@ -85,9 +85,9 @@
 (define (columns mtx)
   (second (dimensions mtx)))
 
+(define %get (foreign-fn "gsl_matrix_get" `(* ,size_t ,size_t) double))
 (define (get mtx row column)
-  ((foreign-fn "gsl_matrix_get" `(* ,size_t ,size_t) double)
-   mtx row column))
+  (%get mtx row column))
 (define ref get)
 (define (set! mtx row column val)
   ((foreign-fn "gsl_matrix_set" `(* ,size_t ,size_t ,double) void)
@@ -285,11 +285,13 @@ Free the matrix afterwards."
 
 (define (for-mtx thunk mtx)
   "Call THUNK with every (ROW COLUMN VALUE) of MTX."
-  (do ((row 0 (1+ row)))
-      ((= row (rows mtx)))
-    (do ((column 0 (1+ column)))
-        ((= column (columns mtx)))
-      (thunk row column (get mtx row column)))))
+  (let ((rows (rows mtx))
+        (columns (columns mtx)))
+    (do ((row 0 (1+ row)))
+        ((= row rows))
+      (do ((column 0 (1+ column)))
+          ((= column columns))
+        (thunk row column (get mtx row column))))))
 (define for-each for-mtx)
 
 (define (ensure-gsl thing)
