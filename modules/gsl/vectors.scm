@@ -216,5 +216,4 @@ Free the vector afterwards."
     (do ((idx 0 (1+ idx)))
         ((= idx len))
       (thunk idx (get vec idx)))))
-
 (define for-each for-vec)
