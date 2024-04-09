@@ -1,12 +1,14 @@
 ;; Runnable from the repository root directory with
 ;; guile --debug -L . test/test.scm
 (define-module (gsl tests)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-64)
   #:use-module (system foreign)
   #:use-module ((gsl vectors) #:prefix vec-)
   #:use-module ((gsl matrices) #:prefix mtx-)
   #:use-module (gsl blas)
-  #:use-module (gsl stat))
+  #:use-module (gsl stat)
+  #:use-module ((gsl eigensystems) #:prefix eigen:))
 
 (test-begin "vector-allocation")
 ;; Empty vector
@@ -181,3 +183,14 @@
 (test-assert (< 9.1 (variance stat-test 10) 9.2))
 (test-assert (< 3.0 (standard-deviation stat-test 10) 3.1))
 (test-end "stat")
+
+(test-begin "eigen")
+(define data (mtx-alloc 4 4 '((1.0 1/2 1/3 1/4)
+                              (1/2 1/3 1/4 1/5)
+                              (1/3 1/4 1/5 1/6)
+                              (1/4 1/5 1/6 1/7))))
+(define solutions (eigen:solve! data))
+(test-assert (< 9.0e-5 (vec-get (first solutions) 3) 10.0e-5))
+
+(test-assert (< 0.75 (mtx-get (second solutions) 0 0) 0.8))
+(test-end "eigen")
