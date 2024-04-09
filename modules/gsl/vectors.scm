@@ -144,6 +144,7 @@ DEST can be one of:
                  (length vec)))
 
 ;; Predicates
+;; FIXME: Maybe call it zero?
 (define (null? vec)
   (< 0 ((foreign-fn "gsl_vector_isnull" '(*) int) vec)))
 (define (positive? vec)

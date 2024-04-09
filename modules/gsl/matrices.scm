@@ -164,6 +164,7 @@ DEST can be one of:
    (rows mtx)))
 
 ;; Predicates
+;; FIXME: Maybe call it zero?
 (define (null? mtx)
   (< 0 ((foreign-fn "gsl_matrix_isnull" '(*) int) mtx)))
 (define (positive? mtx)
