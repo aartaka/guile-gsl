@@ -73,9 +73,10 @@
   (%get vec i))
 (define ref get)
 
+(define %set (foreign-fn "gsl_vector_set" `(* ,size_t ,double) void))
 (define (set! vec i val)
   "Set I-th element in VEC to VAL."
-  ((foreign-fn "gsl_vector_set" `(* ,size_t ,double) void) vec i val))
+  (%set vec i val))
 
 (define (ptr vec i)
   "Get the pointer to the I-th element of VEC."
