@@ -8,12 +8,12 @@
  #:use-module (guix git-download)
  #:use-module ((guix licenses) #:prefix license:))
 
-(define-public guile-gsl
+(define-public guile-gsl-git
   (package
-    (name "guile-gsl")
+    (name "guile-gsl-git")
     (version "0.0.1")
     (source (local-file ".."
-                        "guile-gsl-checkout"
+                        "guile-gsl-git-checkout"
                         #:recursive? #t
                         #:select? (or (git-predicate (dirname (current-source-directory)))
                                       (const #t))))
@@ -41,4 +41,4 @@
     (description "Scheme wrapper around libgsl.so.")
     (license license:gpl3+)))
 
-guile-gsl
+guile-gsl-git
