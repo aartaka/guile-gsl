@@ -7,7 +7,9 @@
             sequence?
             sequence-ref
             sequence-length
-            for-sequence))
+            for-sequence
+            libgsl
+            libgslcblas))
 
 (define libgslcblas (load-foreign-library "libgslcblas.so" #:global? #t))
 ;; (define libgslcblas (load-foreign-library "/home/aartaka/.guix-profile/lib/libgslcblas.so" #:global? #t))
