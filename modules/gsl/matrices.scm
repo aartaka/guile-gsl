@@ -11,6 +11,7 @@
             dimensions
             rows
             columns
+            cols
             get
             ref
             set!
@@ -84,6 +85,7 @@
   (first (dimensions mtx)))
 (define (columns mtx)
   (second (dimensions mtx)))
+(define cols columns)
 
 (define %get (foreign-fn "gsl_matrix_get" `(* ,size_t ,size_t) double))
 (define (get mtx row column)
