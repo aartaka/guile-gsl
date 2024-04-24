@@ -1,6 +1,6 @@
 (define-module (gsl matrices)
   #:use-module (gsl core)
-  #:use-module ((gsl vectors) #:prefix vec-)
+  #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
@@ -200,12 +200,12 @@ DEST can be one of:
 
 ;; Destructive matrix<->vector copying.
 
-(define* (row->vec! mtx row #:optional (vec (vec-alloc (columns mtx))))
+(define* (row->vec! mtx row #:optional (vec (vec:alloc (columns mtx))))
   "Copy the ROW-th row of MTX to VEC (create if not provided.)"
   ((foreign-fn "gsl_matrix_get_row" `(* * ,size_t) int)
    vec mtx row)
   vec)
-(define* (column->vec! mtx column #:optional (vec (vec-alloc (rows mtx))))
+(define* (column->vec! mtx column #:optional (vec (vec:alloc (rows mtx))))
   "Copy the COLUMN-th column of MTX to VEC (create if not provided.)"
   ((foreign-fn "gsl_matrix_get_col" `(* * ,size_t) int)
    vec mtx column)
@@ -313,6 +313,6 @@ Free the matrix afterwards."
            (sequence-length (sequence-ref thing 0))
            thing))
    ((sequence? thing)
-    (vec-alloc (sequence-length thing) thing))
+    (vec:alloc (sequence-length thing) thing))
    (else
     (error "Cannot convert to GSL vector/matrix: " thing))))
