@@ -25,6 +25,7 @@
             ->2d-vector
             ;; Predicates
             null?
+            zero?
             positive?
             negative?
             non-negative?
@@ -166,9 +167,9 @@ DEST can be one of:
    (rows mtx)))
 
 ;; Predicates
-;; FIXME: Maybe call it zero?
 (define (null? mtx)
   (< 0 ((foreign-fn "gsl_matrix_isnull" '(*) int) mtx)))
+(define zero? null?)
 (define (positive? mtx)
   (< 0 ((foreign-fn "gsl_matrix_ispos" '(*) int) mtx)))
 (define (negative? mtx)
