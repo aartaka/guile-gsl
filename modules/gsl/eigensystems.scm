@@ -24,6 +24,6 @@ return the new ones. Otherwise use the provided ones.
 Modifies the MTX."
   (let ((workspace (alloc (mtx:columns mtx))))
     ((foreign-fn "gsl_eigen_symmv" '(* * * *) int)
-     mtx evalues-vec evectors-mtx workspace)
+     (mtx:unwrap mtx) (vec:unwrap evalues-vec) (mtx:unwrap evectors-mtx) workspace)
     (free workspace)
     (list evalues-vec evectors-mtx)))

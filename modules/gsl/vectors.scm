@@ -2,9 +2,16 @@
   #:use-module (gsl core)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-9)
+  #:use-module (srfi srfi-9 gnu)
   #:use-module (srfi srfi-43)
   #:export-syntax (with)
-  #:export ( ;; Accessors
+  #:export (;; Wrapping
+            wrap
+            unwrap
+            vec?
+            ;; Accessors
+            type
             parts
             length
             data
@@ -52,6 +59,26 @@
             for-vec
             for-each))
 
+(define-record-type <vec>
+  (wrap pointer type)
+  vec?
+  (pointer unwrap)
+  (type type))
+(set-record-type-printer!
+ <vec>
+ (lambda (v p)
+   (format p "#<gsl_vector~a of ~d of ~a>"
+           (if (eq? 'f32 (type v))
+               "_float"
+               "")
+           (length v)
+           (cond
+            ((null? v) "zeros")
+            ((positive? v) "positives")
+            ((negative? v) "negatives")
+            ((non-negative? v) "nonnegatives")
+            (else "nondescripts")))))
+
 ;; Access
 (define (parts vec)
   "Return VEC structure parts:
@@ -60,43 +87,62 @@
 - data (pointer)
 - block (pointer)
 - and owner (int)"
-  (parse-c-struct vec (list size_t size_t '* '* int)))
+  (parse-c-struct (unwrap vec) (list size_t size_t '* '* int)))
 (define (length vec)
   "Number of elements in VEC."
   (first (parts vec)))
 (define (data vec)
-  "Pointer the the actual data (double numbers) residing in VEC."
+  "Pointer to the actual data (float/double numbers) residing in VEC."
   (third (parts vec)))
 
+(define (dispatch vec f64 f32)
+  (case (type vec)
+    ((f64) f64)
+    ((f32) f32)))
+
 (define %get (foreign-fn "gsl_vector_get" `(* ,size_t) double))
+(define %get-f32 (foreign-fn "gsl_vector_float_get" `(* ,size_t) float))
 (define (get vec i)
   "Get I-th element VEC."
-  (%get vec i))
+  ((dispatch vec %get %get-f32)
+   (unwrap vec) i))
 (define ref get)
 
 (define %set (foreign-fn "gsl_vector_set" `(* ,size_t ,double) void))
+(define %set-f32 (foreign-fn "gsl_vector_float_set" `(* ,size_t ,float) void))
 (define (set! vec i val)
   "Set I-th element in VEC to VAL."
-  (%set vec i val))
+  ((dispatch vec %set %set-f32)
+   (unwrap vec) i val))
 
 (define (ptr vec i)
   "Get the pointer to the I-th element of VEC."
-  ((foreign-fn "gsl_vector_ptr" `(* ,size_t) '*) vec i))
+  ((foreign-fn
+    (dispatch vec
+              "gsl_vector_float_ptr"
+              "gsl_vector_ptr")
+    `(* ,size_t) '*) (unwrap vec) i))
 
 ;; Vector (de)allocation
-(define* (alloc k #:optional (fill #f))
-  "Create a new gsl_vector of size K filled with FILL.
+(define* (alloc k #:optional (fill #f) (type 'f64))
+  "Create a new TYPEd vector of size K filled with FILL.
 FILL might be one of:
 - #f for uninitialized vector (garbage values, use `calloc' for
   zero-initialized or numeric FILL for constant-initialized vector).
 - Real number to fill the vector with the same double value.
 - Scheme vector/list of real numbers."
-  (let ((vec ((foreign-fn "gsl_vector_alloc" (list size_t) '*) k)))
+  (let ((vec (wrap ((foreign-fn (case type
+                                  ((f64) "gsl_vector_alloc")
+                                  ((f32) "gsl_vector_float_alloc")) (list size_t) '*)
+                    k)
+                   type)))
     (when fill
       (cond
        ((number? fill)
-        ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
-         vec fill))
+        ((dispatch vec
+                   (foreign-fn "gsl_vector_set_all" `(* ,double) void)
+                   (foreign-fn "gsl_vector_float_set_all" `(* ,float) void))
+         (unwrap vec) fill))
        ((sequence? fill)
         (for-sequence
          (lambda (idx elem)
@@ -107,16 +153,26 @@ FILL might be one of:
         (error "Don't know how to fill a vector with" fill))))
     vec))
 (define make alloc)
-(define (calloc size)
-  "Allocate a 0-initialized vector of size SIZE"
-  ((foreign-fn "gsl_vector_calloc" (list size_t) '*) size))
-(define free
-  (foreign-fn "gsl_vector_free" '(*) void))
+(define* (calloc size #:optional (type 'f64))
+  "Allocate a 0-initialized TYPEd vector of size SIZE"
+  (wrap ((foreign-fn (case type
+                       ((f64) "gsl_vector_calloc")
+                       ((f32) "gsl_vector_float_calloc"))
+                     (list size_t) '*) size)
+        type))
+(define (free vec)
+  ((foreign-fn (dispatch vec
+                         "gsl_vector_free"
+                         "gsl_vector_float_free")
+               '(*) void)
+   (unwrap vec)))
 
 (define (fill! vec fill)
   "Fill the VEC with FILL, a number."
-  ((foreign-fn "gsl_vector_set_all" `(* ,double) void)
-   vec fill))
+  ((dispatch vec
+             (foreign-fn "gsl_vector_set_all" `(* ,double) void)
+             (foreign-fn "gsl_vector_float_set_all" `(* ,float) void))
+   (unwrap vec) fill))
 
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC vector to DEST.
@@ -125,19 +181,27 @@ DEST can be one of:
 - Pointer to copy SRC into it."
   (let ((real-dest (cond
                     ((eq? #t dest)
-                     (alloc (length src)))
+                     (unwrap (alloc (length src) 0 (type src))))
                     ((pointer? dest)
                      dest)
+                    ((vec? dest)
+                     (unwrap dest))
                     (else
-                     (error "Cannot copy the matrix into " dest)))))
-    ((foreign-fn "gsl_vector_memcpy" '(* *) int)
-     real-dest src)
-    real-dest))
+                     (error "Cannot copy the vector into " dest)))))
+    ((foreign-fn (dispatch src
+                           "gsl_vector_memcpy"
+                           "gsl_vector_float_memcpy")
+                 '(* *) int)
+     real-dest (unwrap src))
+    (wrap real-dest (type src))))
 
 (define (swap! a b)
   "Exchange the values between A and B (vectors)."
-  ((foreign-fn "gsl_vector_swap" '(* *) int)
-   a b))
+  ((foreign-fn (dispatch a
+                         "gsl_vector_swap"
+                         "gsl_vector_float_swap")
+               '(* *) int)
+   (unwrap a) (unwrap b)))
 
 (define (->vector vec)
   "Convert VEC to a Scheme vector."
@@ -146,24 +210,62 @@ DEST can be one of:
 
 ;; Predicates
 (define (null? vec)
-  (< 0 ((foreign-fn "gsl_vector_isnull" '(*) int) vec)))
+  (< 0 ((foreign-fn (dispatch vec
+                              "gsl_vector_isnull"
+                              "gsl_vector_float_isnull")
+                    '(*) int) (unwrap vec))))
 (define zero? null?)
 (define (positive? vec)
-  (< 0 ((foreign-fn "gsl_vector_ispos" '(*) int) vec)))
+  (< 0 ((foreign-fn (dispatch vec
+                              "gsl_vector_ispos"
+                              "gsl_vector_float_ispos") '(*) int)
+        (unwrap vec))))
 (define (negative? vec)
-  (< 0 ((foreign-fn "gsl_vector_isneg" '(*) int) vec)))
+  (< 0 ((foreign-fn (dispatch vec
+                              "gsl_vector_isneg"
+                              "gsl_vector_float_isneg") '(*) int)
+        (unwrap vec))))
 (define (non-negative? vec)
-  (< 0 ((foreign-fn "gsl_vector_isnonneg" '(*) int) vec)))
+  (< 0 ((foreign-fn (dispatch vec
+                              "gsl_vector_isnonneg"
+                              "gsl_vector_float_isnonneg") '(*) int)
+        (unwrap vec))))
+(define nonnegative? non-negative?)
 (define (equal? vec1 vec2)
-  (< 0 ((foreign-fn "gsl_vector_equal" '(* *) int) vec1 vec2)))
+  (< 0 ((foreign-fn (dispatch vec1
+                              "gsl_vector_equal"
+                              "gsl_vector_float_equal") '(* *) int)
+        (unwrap vec1) (unwrap vec2))))
 
 ;; Aggregate functions
 
-(define sum (foreign-fn "gsl_vector_sum" '(*) double))
-(define min (foreign-fn "gsl_vector_min" '(*) double))
-(define min-index (foreign-fn "gsl_vector_min_index" '(*) size_t))
-(define max (foreign-fn "gsl_vector_max" '(*) double))
-(define max-index (foreign-fn "gsl_vector_max_index" '(*) size_t))
+(define (sum vec)
+  ((dispatch vec
+             (foreign-fn "gsl_vector_sum" '(*) double)
+             (foreign-fn "gsl_vector_float_sum" '(*) float))
+   (unwrap vec)))
+(define (min vec)
+  ((dispatch vec
+             (foreign-fn "gsl_vector_min" '(*) double)
+             (foreign-fn "gsl_vector_float_min" '(*) float))
+   (unwrap vec)))
+(define (max vec)
+  ((dispatch vec
+             (foreign-fn "gsl_vector_max" '(*) double)
+             (foreign-fn "gsl_vector_float_max" '(*) float))
+   (unwrap vec)))
+(define (min-index vec)
+  ((foreign-fn (dispatch vec
+                         "gsl_vector_min_index"
+                         "gsl_vector_float_min_index")
+               '(*) size_t)
+   (unwrap vec)))
+(define (max-index vec)
+  ((foreign-fn (dispatch vec
+                         "gsl_vector_max_index"
+                         "gsl_vector_float_max_index")
+               '(*) size_t)
+   (unwrap vec)))
 
 ;; Operations
 
@@ -174,44 +276,71 @@ DEST can be one of:
       (op new arg)
       new)))
 
-(define add! (foreign-fn "gsl_vector_add" '(* *) int))
+(define (add! vec1 vec2)
+  ((foreign-fn (dispatch vec1
+                         "gsl_vector_add"
+                         "gsl_vector_float_add") '(* *) int)
+   (unwrap vec1) (unwrap vec2)))
 (define add (act-on-copy add!))
 
-(define subtract! (foreign-fn "gsl_vector_sub" '(* *) int))
+(define (subtract! vec1 vec2)
+  ((foreign-fn (dispatch vec1
+                         "gsl_vector_sub"
+                         "gsl_vector_float_sub") '(* *) int)
+   (unwrap vec1) (unwrap vec2)))
 (define subtract (act-on-copy subtract!))
 
-(define multiply! (foreign-fn "gsl_vector_mul" '(* *) int))
+(define (multiply! vec1 vec2)
+  ((foreign-fn (dispatch vec1
+                         "gsl_vector_mul"
+                         "gsl_vector_float_mul") '(* *) int)
+   (unwrap vec1) (unwrap vec2)))
 (define multiply (act-on-copy multiply!))
 
-(define divide! (foreign-fn "gsl_vector_div" '(* *) int))
+(define (divide! vec1 vec2)
+  ((foreign-fn (dispatch vec1
+                         "gsl_vector_div"
+                         "gsl_vector_float_div") '(* *) int)
+   (unwrap vec1) (unwrap vec2)))
 (define divide (act-on-copy divide!))
 
-(define scale! (foreign-fn "gsl_vector_scale" `(* ,double) int))
+(define (scale! vec scale)
+  ((dispatch vec
+             (foreign-fn "gsl_vector_scale" `(* ,double) int)
+             (foreign-fn "gsl_vector_float_scale" `(* ,float) int))
+   (unwrap vec) scale))
 (define scale (act-on-copy scale!))
 
-(define add-constant! (foreign-fn "gsl_vector_add_constant" `(* ,double) int))
+(define (add-constant! vec constant)
+  ((dispatch vec
+             (foreign-fn "gsl_vector_add_constant" `(* ,double) int)
+             (foreign-fn "gsl_vector_float_add_constant" `(* ,float) int))
+   (unwrap vec) constant))
 (define add-constant (act-on-copy add-constant!))
 
 (define (axpby! alpha x beta y)
   "Perform αx + βy and store the result in Y."
-  ((foreign-fn "gsl_vector_axpby" `(,double * ,double *) int)
-   alpha x beta y))
+  ((dispatch x
+             (foreign-fn "gsl_vector_axpby" `(,double * ,double *) int)
+             (foreign-fn "gsl_vector_float_axpby" `(,float * ,float *) int))
+   (unwrap alpha) x (unwrap beta) y))
 
 ;; TODO: call-with-copy
-(define (call-with-vec size fill thunk)
-  "Call THUNK with a new SIZE-d vector FILLed with data.
+(define* (call-with-vec size thunk #:optional (fill #f) (type 'f64))
+  "Call THUNK with a new SIZE-d and TYPEd vector FILLed with data.
 Free the vector afterwards."
-  (let* ((vec (alloc size fill))
+  (let* ((vec (alloc size fill type))
          (result (thunk vec)))
     (free vec)
     result))
 
-(define-syntax-rule (with (vec size fill) body ...)
+(define-syntax-rule (with (vec size arg ...) body ...)
   "Run BODY with VEC bound to SIZE-d vector FILLed with data."
   (call-with-vec
-   size fill
+   size
    (lambda (vec)
-     body ...)))
+     body ...)
+   arg ...))
 
 (define (for-vec thunk vec)
   "Call THUNK with (INDEX VALUE) of every element in VEC."
