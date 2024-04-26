@@ -412,7 +412,7 @@ DEST might be one of:
 (define add-constant (act-on-copy add-constant!))
 
 ;; TODO: call-with-copy
-(define* (call-with-mtx rows columns thunk #:optional fill type)
+(define* (call-with-mtx rows columns thunk #:optional (fill #f) (type 'f64))
   "Call THUNK on a new ROWxCOLUMNS FILL-ed matrix.
 Free the matrix afterwards."
   (let* ((mtx (alloc rows columns fill type))
