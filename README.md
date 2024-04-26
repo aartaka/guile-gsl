@@ -90,4 +90,16 @@ FILL might be one of:
 - Or a list/vector of lists/vectors with numbers to fill in.
 > ,apropos dgemm
 (gsl blas): dgemm!	#<procedure dgemm! (amtx bmtx cmtx #:key alpha beta transpose-a transpose-b)>
+> (use-modules ((gsl matrices) #:prefix mtx:))
+> ,apropos mtx:
+(gsl matrices): mtx:alloc	#<procedure alloc (n-rows n-columns #:optional fill)>
+(gsl matrices): mtx:add-constant	#<procedure 7f31d7b068c0 at gsl/matrices.scm:241:2 (mtx arg)>
+(gsl matrices): mtx:with
+(gsl matrices): mtx:add!	#<procedure 7f31d7b008e0 (_ _)>
+(gsl matrices): mtx:divide-elements	#<procedure 7f31d7b06b40 at gsl/matrices.scm:241:2 (mtx arg)>
+(gsl matrices): mtx:ensure-gsl	#<procedure ensure-gsl (thing)>
+(gsl matrices): mtx:vec->row!	#<procedure vec->row! (vec mtx row)>
+(gsl matrices): mtx:max	#<procedure 7f31d7b00920 (_)>
+(gsl matrices): mtx:rows	#<procedure rows (mtx)>
+...
 ```
