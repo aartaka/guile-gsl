@@ -6,8 +6,8 @@ use in Guile.
 
 ## Installation
 
-Ensure that you have the modules/ directory in your `GUILE_LOAD_PATH`/`%load-path` and load it.
-That's all there is it.
+Ensure that you have the `modules/` directory in your `GUILE_LOAD_PATH`/`%load-path` and load it.
+You might need to adjust the directory paths in `modules/gsl/core.scm` to make GSL .so-s discoverable.
 
 Environment management is easier with Guix, that's why there's guix.scm.
 You can also install this repo as a Guix channel:
