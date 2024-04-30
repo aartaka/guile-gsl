@@ -25,10 +25,10 @@ Both guix.scm and the channel provide `guile-gsl-git` package with the fresh cod
 
 ## Getting Started
 
-Install this library to where Guile can find it (Guix package
-definition is already provided) and start the REPL. 
-`use-modules` the ones you need and make your computations. 
-Here's a BLAS example from the GSL docs, adjusted to Scheme:
+Install this library to where Guile can find it (see Installation) and
+start the REPL. `use-modules` the ones you need and make your
+computations. Here's a BLAS example from the GSL docs, adjusted to
+Scheme:
 
 ``` scheme
 (use-modules ((gsl matrices) #:prefix mtx:))
