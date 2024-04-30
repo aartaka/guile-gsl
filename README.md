@@ -78,7 +78,7 @@ raw:
 (use-modules ((gsl blas) #:prefix blas:))
 ```
 
-Overall, you're best served by interactive help facilities Guile
+In terms of documentation and API listing, you're best served by interactive help facilities Guile
 provides:
 ``` scheme
 > ,describe mtx:alloc
