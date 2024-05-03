@@ -6,7 +6,9 @@
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-9 gnu)
   #:use-module (srfi srfi-43)
-  #:export-syntax (with)
+  #:export-syntax (with
+                   with-column
+                   with-row)
   #:export (;; Wrapping
             wrap
             unwrap
@@ -69,6 +71,8 @@
             add-constant
             ;; Helpers
             call-with-mtx
+            call-with-row
+            call-with-column
             for-mtx
             for-each
             ensure-gsl))
@@ -427,6 +431,32 @@ Free the matrix afterwards."
    (lambda (mtx)
      body ...)
    arg ...))
+
+(define* (call-with-row mtx row thunk)
+  "Call THUNK with a temporary vector created from ROWth row of MTX."
+  (let* ((vec (row->vec! mtx row))
+         (result (thunk vec)))
+    (vec:free vec)
+    result))
+(define-syntax-rule (with-row (vec mtx row) body ...)
+  "Run BODY with VEC bound to the ROWth row of MTX."
+  (call-with-row
+   mtx row
+   (lambda (vec)
+     body ...)))
+
+(define* (call-with-column mtx column thunk)
+  "Call THUNK with a temporary vector created from MTX COLUMNth column."
+  (let* ((vec (column->vec! mtx column))
+         (result (thunk vec)))
+    (vec:free vec)
+    result))
+(define-syntax-rule (with-column (vec mtx column) body ...)
+  "Run BODY with VEC bound to the COLUMNth column of MTX."
+  (call-with-column
+   mtx column
+   (lambda (vec)
+     body ...)))
 
 (define (for-mtx thunk mtx)
   "Call THUNK with every (ROW COLUMN VALUE) of MTX."
