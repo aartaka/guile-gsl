@@ -124,64 +124,64 @@
    ((pointer? thing)
     f64)))
 
-(define (dot vec1 vec2)
-  (check-types vec1 vec2)
-  (dispatch vec1
+(define (dot xvec yvec)
+  (check-types xvec yvec)
+  (dispatch xvec
             (let ((result (make-c-ptr double)))
-              ((blas-fn "ddot" '(* * *)) (vec:unwrap vec1) (vec:unwrap vec2) result)
+              ((blas-fn "ddot" '(* * *)) (vec:unwrap xvec) (vec:unwrap yvec) result)
               (first (parse-c-struct result (list double))))
             (let ((result (make-c-ptr float)))
-              ((blas-fn "sdot" '(* * *)) (vec:unwrap vec1) (vec:unwrap vec2) result)
+              ((blas-fn "sdot" '(* * *)) (vec:unwrap xvec) (vec:unwrap yvec) result)
               (first (parse-c-struct result (list float))))))
 (define ddot dot)
-(define (nrm2 vec)
-  ((dispatch vec
+(define (nrm2 xvec)
+  ((dispatch xvec
              (blas-fn "dnrm2" '(*) double)
              (blas-fn "snrm2" '(*) float))
-   (vec:unwrap vec)))
+   (vec:unwrap xvec)))
 (define dnrm2 nrm2)
 
-(define (asum vec)
-  ((dispatch vec
+(define (asum xvec)
+  ((dispatch xvec
              (blas-fn "dasum" '(*) double)
              (blas-fn "sasum" '(*) float))
-   (vec:unwrap vec)))
+   (vec:unwrap xvec)))
 (define dasum asum)
 
-(define (iamax vec)
-  ((blas-fn (dispatch vec "idamax" "isamax") '(*) size_t)
-   (vec:unwrap vec)))
+(define (iamax xvec)
+  ((blas-fn (dispatch xvec "idamax" "isamax") '(*) size_t)
+   (vec:unwrap xvec)))
 (define idamax iamax)
 
-(define (swap! vec1 vec2)
-  (check-types vec1 vec2)
-  ((blas-fn (dispatch vec1
+(define (swap! xvec yvec)
+  (check-types xvec yvec)
+  ((blas-fn (dispatch xvec
                       "dswap"
                       "sswap") '(* *))
-   (vec:unwrap vec1) (vec:unwrap vec2)))
+   (vec:unwrap xvec) (vec:unwrap yvec)))
 (define dswap! swap!)
 
-(define (copy! vec1 vec2)
-  (check-types vec1 vec2)
-  ((blas-fn (dispatch vec1
+(define (copy! xvec yvec)
+  (check-types xvec yvec)
+  ((blas-fn (dispatch xvec
                       "dcopy"
                       "scopy") '(* *))
-   (vec:unwrap vec1) (vec:unwrap vec2)))
+   (vec:unwrap xvec) (vec:unwrap yvec)))
 (define dcopy! copy!)
 
-(define (axpy! alpha x y)
-  (check-types x y)
-  ((dispatch x
+(define (axpy! alpha xvec yvec)
+  (check-types xvec yvec)
+  ((dispatch xvec
              (blas-fn "daxpy" `(,double * *))
              (blas-fn "saxpy" `(,float * *)))
-   alpha (vec:unwrap x) (vec:unwrap y)))
+   alpha (vec:unwrap xvec) (vec:unwrap yvec)))
 (define daxpy! axpy!)
 
-(define (scal! alpha vec)
-  ((dispatch vec
+(define (scal! alpha xvec)
+  ((dispatch xvec
              (blas-fn "dscal" `(,double *) void)
              (blas-fn "sscal" `(,float *) void))
-   alpha (vec:unwrap vec)))
+   alpha (vec:unwrap xvec)))
 (define scale! scal!)
 (define dscal! scal!)
 
