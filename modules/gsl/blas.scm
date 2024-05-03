@@ -271,9 +271,9 @@
    uplo transpose alpha (mtx:unwrap amtx) beta (mtx:unwrap cmtx)))
 (define dsyrk! syrk!)
 
-(define* (syrk2! amtx cmtx #:key (alpha 1.0) (beta 1.0) (uplo +upper+) (transpose +no-trans+))
+(define* (syr2k! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (transpose +no-trans+) (uplo +upper+))
   ((dispatch amtx
-             (blas-fn "dsyrk2" `(,int ,int ,double * ,double *))
-             (blas-fn "ssyrk2" `(,int ,int ,float * ,float *)))
-   uplo transpose alpha (mtx:unwrap amtx) beta (mtx:unwrap cmtx)))
-(define dsyrk2! syrk2!)
+             (blas-fn "dsyr2k" `(,int ,int ,double * * ,double *))
+             (blas-fn "ssyr2k" `(,int ,int ,float * * ,float *)))
+   uplo transpose alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
+(define dsyr2k! syr2k!)
