@@ -191,6 +191,14 @@
              (blas-fn "sgemv" `(,int ,float * * ,float *)))
    transpose alpha (mtx:unwrap amtx) (vec:unwrap xvec) beta (vec:unwrap yvec)))
 (define dgemv! gemv!)
+(define* (gemv amtx xvec #:key (alpha 1.0) (transpose +no-trans+))
+  (let ((yvec (vec:alloc (if (= transpose +no-trans+)
+                             (mtx:columns amtx)
+                             (mtx:rows amtx))
+                         0 (mtx:type amtx))))
+    (gemv! amtx xvec yvec
+            #:beta 0  #:alpha alpha #:transpose transpose)
+    yvec))
 
 (define* (trmv! amtx xvec #:key (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   ((blas-fn (dispatch amtx
@@ -212,6 +220,10 @@
              (blas-fn "ssymv" `(,int ,float * * ,float *)))
    uplo alpha (mtx:unwrap amtx) (vec:unwrap xvec) beta (vec:unwrap yvec)))
 (define dsymv! symv!)
+(define* (symv amtx xvec #:key (uplo +upper+) (alpha 1.0))
+  (let ((yvec (vec:alloc (mtx:rows amtx) 0 (mtx:type amtx))))
+    (symv! amtx xvec yvec #:beta 0 #:alpha alpha #:uplo uplo)
+    yvec))
 
 (define* (ger! xvec yvec amtx #:key (alpha 1.0))
   ((dispatch xvec
@@ -219,6 +231,11 @@
              (blas-fn "sger" `(,float * * *)))
    alpha (vec:unwrap xvec) (vec:unwrap yvec) (mtx:unwrap amtx)))
 (define dger! ger!)
+(define* (ger xvec yvec #:key (alpha 1.0))
+  (let ((amtx (mtx:alloc (vec:length xvec) (vec:length yvec)
+                         0 (vec:type xvec))))
+    (ger! xvec yvec amtx #:alpha alpha)
+    amtx))
 
 (define* (syr! xvec amtx #:key (uplo +upper+) (alpha 1.0))
   ((dispatch xvec
@@ -226,6 +243,11 @@
              (blas-fn "ssyr" `(,int ,float * *)))
    uplo alpha (vec:unwrap xvec) (mtx:unwrap amtx)))
 (define dsyr! syr!)
+(define* (syr xvec #:key (alpha 1.0))
+  (let ((amtx (mtx:alloc (vec:length xvec) (vec:length xvec)
+                         0 (vec:type xvec))))
+    (syr! xvec amtx #:alpha alpha)
+    amtx))
 
 (define* (syr2! xvec yvec amtx #:key (uplo +upper+) (alpha 1.0))
   ((dispatch xvec
@@ -233,6 +255,11 @@
              (blas-fn "ssyr2" `(,int ,float * * *)))
    uplo alpha (vec:unwrap xvec) (vec:unwrap yvec) (mtx:unwrap amtx)))
 (define dsyr2! syr2!)
+(define* (syr2 xvec yvec #:key (alpha 1.0))
+  (let ((amtx (mtx:alloc (vec:length xvec) (vec:length xvec)
+                         0 (vec:type xvec))))
+    (syr2! xvec yvec amtx #:alpha alpha)
+    amtx))
 
 ;; Level 3
 
@@ -242,6 +269,12 @@
              (blas-fn "sgemm" `(,int ,int ,float * * ,float *)))
    transpose-a transpose-b alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
 (define dgemm! gemm!)
+(define* (gemm amtx bmtx #:key (alpha 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
+  (let ((cmtx (mtx:alloc (mtx:rows amtx) (mtx:columns bmtx)
+                         0 (mtx:type amtx))))
+    (gemm! amtx bmtx cmtx
+           #:beta 0 #:alpha alpha
+           #:transpose-a transpose-a #:transpose-b transpose-b)))
 
 (define* (symm! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
   ((dispatch amtx
@@ -249,6 +282,13 @@
              (blas-fn "dsymm" `(,int ,int ,float * * ,float *)))
    side uplo alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
 (define dsymm! symm!)
+(define* (symm amtx bmtx #:key (alpha 1.0) (side +right+) (uplo +upper+))
+  (let ((cmtx (if (= side +right+)
+                  (mtx:alloc (mtx:rows bmtx) (mtx:columns amtx) 0 (mtx:type amtx))
+                  (mtx:alloc (mtx:rows amtx) (mtx:columns bmtx) 0 (mtx:type amtx)))))
+    (symm! amtx bmtx cmtx
+           #:beta 0 #:alpha alpha #:side side #:uplo uplo)
+    cmtx))
 
 (define* (trmm! amtx bmtx #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   ((dispatch amtx
@@ -270,6 +310,10 @@
              (blas-fn "ssyrk" `(,int ,int ,float * ,float *)))
    uplo transpose alpha (mtx:unwrap amtx) beta (mtx:unwrap cmtx)))
 (define dsyrk! syrk!)
+(define* (syrk amtx #:key (alpha 1.0) (uplo +upper+) (transpose +no-trans+))
+  (let ((cmtx (mtx:alloc (mtx:rows amtx) (mtx:rows amtx) 0 (mtx:type amtx))))
+    (syrk! amtx cmtx #:beta 0 #:alpha alpha #:uplo uplo #:transpose transpose)
+    cmtx))
 
 (define* (syr2k! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (transpose +no-trans+) (uplo +upper+))
   ((dispatch amtx
@@ -277,3 +321,12 @@
              (blas-fn "ssyr2k" `(,int ,int ,float * * ,float *)))
    uplo transpose alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
 (define dsyr2k! syr2k!)
+(define* (syr2k amtx bmtx #:key (alpha 1.0) (transpose +no-trans+) (uplo +upper+))
+  (let ((cmtx (if (= transpose +no-trans+)
+                  (mtx:alloc (mtx:rows amtx) (mtx:rows amtx)
+                             0 (mtx:type amtx))
+                  (mtx:alloc (mtx:columns amtx) (mtx:columns amtx)
+                             0 (mtx:type amtx)))))
+    (syr2k! amtx bmtx cmtx
+            #:beta 0 #:alpha alpha #:transpose transpose #:uplo uplo)
+    cmtx))
