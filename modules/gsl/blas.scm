@@ -1,5 +1,5 @@
 (define-module (gsl blas)
-  #:use-module (gsl core)
+  #:use-module (gsl utils)
   #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module ((gsl matrices)  #:prefix mtx:)
   #:use-module (system foreign)

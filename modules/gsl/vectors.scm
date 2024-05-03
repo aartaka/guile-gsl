@@ -1,5 +1,5 @@
 (define-module (gsl vectors)
-  #:use-module (gsl core)
+  #:use-module (gsl utils)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)

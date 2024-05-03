@@ -1,5 +1,5 @@
 (define-module (gsl eigensystems)
-  #:use-module (gsl core)
+  #:use-module (gsl utils)
   #:use-module ((gsl matrices) #:prefix mtx:)
   #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module (system foreign)

@@ -1,5 +1,5 @@
 (define-module (gsl stat)
-  #:use-module (gsl core)
+  #:use-module (gsl utils)
   #:use-module (system foreign)
   #:export (mean
             variance

@@ -1,5 +1,5 @@
 (define-module (gsl matrices)
-  #:use-module (gsl core)
+  #:use-module (gsl utils)
   #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)

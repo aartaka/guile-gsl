@@ -2,51 +2,16 @@
   #:use-module (system foreign)
   #:use-module (system foreign-library)
   #:use-module (system foreign-object)
-  #:export (foreign-fn
-            make-c-ptr
-            sequence?
-            sequence-ref
-            sequence-length
-            for-sequence
-            libgsl
-            libgslcblas))
+  #:export (libgsl
+            libgslcblas
+            foreign-fn
+            set-error-handler
+            strerror))
 
 (define libgslcblas (load-foreign-library "libgslcblas.so" #:global? #t))
 ;; (define libgslcblas (load-foreign-library "/home/aartaka/.guix-profile/lib/libgslcblas.so" #:global? #t))
 (define libgsl (load-foreign-library "libgsl.so"))
 ;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
-
-(define (sequence? seq)
-  (or (list? seq)
-      (vector? seq)))
-
-(define (sequence-ref seq k)
-  ((if (list? seq)
-       list-ref
-       vector-ref)
-   seq k))
-
-(define (sequence-length seq)
-  "Return the length of SEQ, whether list of vector."
-  ((if (list? seq)
-       length
-       vector-length)
-   seq))
-
-(define (for-sequence thunk seq)
-  "Walk the elements of SEQ (list/vector) calling THUNK on index & value."
-  (if (sequence? seq)
-      (do ((len ((if (list? seq)
-                     length
-                     vector-length)
-                 seq))
-           (idx 0 (1+ idx)))
-          ((= idx len))
-        (thunk idx ((if (list? seq)
-                        list-ref
-                        vector-ref)
-                    seq idx)))
-      (error "for-seq called on a non-sequence: " seq)))
 
 (define* (foreign-fn name args #:optional (return-type int))
   "Generate `foreign-library-function' for GSL from a shorter form."
@@ -54,9 +19,6 @@
    libgsl name
    #:return-type return-type
    #:arg-types args))
-
-(define* (make-c-ptr type #:optional (val 0))
-  (make-c-struct (list type) (list val)))
 
 (define (strerror errno)
   (pointer->string ((foreign-fn "gsl_strerror" (list int) '*) errno)))
