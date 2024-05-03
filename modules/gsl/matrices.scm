@@ -425,7 +425,7 @@ Free the matrix afterwards."
     result))
 
 (define-syntax-rule (with (mtx rows columns arg ...) body ...)
-  "Run BODY with MTX bound to ROWSxCOLUMNS matrix FILLed with data."
+  "Run BODY with MTX bound to ROWSxCOLUMNS matrix initialized with ARGS."
   (call-with-mtx
    rows columns
    (lambda (mtx)
