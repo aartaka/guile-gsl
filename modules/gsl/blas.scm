@@ -45,31 +45,40 @@
             ;; Level 2
             gemv!
             dgemv!
+            gemv
             trmv!
             dtrmv!
             trsv!
             dtrsv!
             symv!
             dsymv!
+            symv
             ger!
             dger!
+            ger
             syr!
             dsyr!
+            syr
             syr2!
             dsyr2!
+            syr2
             ;; Level 3
             gemm!
             dgemm!
+            gemm
             symm!
             dsymm!
+            symm
             trmm!
             dtrmm!
             trsm!
             dtrsm!
             syrk!
             dsyrk!
-            syrk2!
-            dsyrk2!))
+            syrk
+            syr2k!
+            dsyr2k!
+            syr2k))
 
 (define (check-types . objects)
   (let ((types (map (lambda (obj)
