@@ -160,12 +160,12 @@ FILL might be one of:
                        ((f32) "gsl_vector_float_calloc"))
                      (list size_t) '*) size)
         type))
-(define (free vec)
-  ((foreign-fn (dispatch vec
-                         "gsl_vector_free"
-                         "gsl_vector_float_free")
-               '(*) void)
-   (unwrap vec)))
+(define (free vec . vecs)
+  (let ((fn (foreign-fn (dispatch vec
+                                  "gsl_vector_free"
+                                  "gsl_vector_float_free")
+                        '(*) void)))
+    (map (compose fn unwrap) (cons vec vecs))))
 
 (define (fill! vec fill)
   "Fill the VEC with FILL, a number."

@@ -189,11 +189,11 @@ FILL might be one of:
                        ((f32) "gsl_matrix_float_calloc")) (list size_t size_t) '*)
          row columns)
         type))
-(define (free mtx)
-  ((foreign-fn (dispatch mtx
-                         "gsl_matrix_free"
-                         "gsl_matrix_float_free") '(*) void)
-   (unwrap mtx)))
+(define (free mtx . mtxs)
+  (let ((fn (foreign-fn (dispatch mtx
+                                  "gsl_matrix_free"
+                                  "gsl_matrix_float_free") '(*) void)))
+    (map (compose fn unwrap) (cons mtx mtxs))))
 
 (define (fill! mtx fill)
   ((foreign-fn (dispatch mtx
