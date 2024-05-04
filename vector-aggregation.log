@@ -1,0 +1,72 @@
+%%%% Starting test vector-aggregation
+Group begin: vector-aggregation
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 50
+  source-form: (test-assert (vec-null? vec-calloc-ed))
+Test end:
+  result-kind: pass
+  actual-value: #t
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 51
+  source-form: (test-assert (vec-non-negative? vec1))
+Test end:
+  result-kind: pass
+  actual-value: #t
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 52
+  source-form: (test-assert (vec-positive? vec2))
+Test end:
+  result-kind: pass
+  actual-value: #t
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 53
+  source-form: (test-assert (vec-equal? vec3 vec3-copy1))
+Test end:
+  result-kind: pass
+  actual-value: #t
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 55
+  source-form: (test-eqv 48.0 (vec-sum vec2))
+Test end:
+  result-kind: pass
+  actual-value: 48.0
+  expected-value: 48.0
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 56
+  source-form: (test-eqv 3.0 (vec-max vec3))
+Test end:
+  result-kind: pass
+  actual-value: 3.0
+  expected-value: 3.0
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 57
+  source-form: (test-eqv 2 (vec-max-index vec3))
+Test end:
+  result-kind: pass
+  actual-value: 2
+  expected-value: 2
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 58
+  source-form: (test-eqv -2.0 (vec-min vec3))
+Test end:
+  result-kind: pass
+  actual-value: -2.0
+  expected-value: -2.0
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 59
+  source-form: (test-eqv 1 (vec-min-index vec3))
+Test end:
+  result-kind: pass
+  actual-value: 1
+  expected-value: 1
+Group end: vector-aggregation
+# of expected passes      9

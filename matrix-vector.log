@@ -1,0 +1,36 @@
+%%%% Starting test matrix-vector
+Group begin: matrix-vector
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 127
+  source-form: (test-eqv -2.0 (mtx-get mtx2-copy1 0 1))
+Test end:
+  result-kind: pass
+  actual-value: -2.0
+  expected-value: -2.0
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 130
+  source-form: (test-eqv 3.0 (mtx-get mtx2-copy1 1 0))
+Test end:
+  result-kind: pass
+  actual-value: 3.0
+  expected-value: 3.0
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 134
+  source-form: (test-eqv 3.0 (vec-get vec3-copy1 0))
+Test end:
+  result-kind: pass
+  actual-value: 3.0
+  expected-value: 3.0
+Test begin:
+  source-file: "test/test.scm"
+  source-line: 137
+  source-form: (test-eqv 4.0 (vec-get vec3-copy2 1))
+Test end:
+  result-kind: pass
+  actual-value: 4.0
+  expected-value: 4.0
+Group end: matrix-vector
+# of expected passes      4

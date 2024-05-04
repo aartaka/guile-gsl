@@ -4,7 +4,6 @@
   #:use-module (system foreign-object)
   #:export (libgsl
             libgslcblas
-            foreign-fn
             set-error-handler
             strerror))
 
@@ -12,13 +11,6 @@
 ;; (define libgslcblas (load-foreign-library "/home/aartaka/.guix-profile/lib/libgslcblas.so" #:global? #t))
 (define libgsl (load-foreign-library "libgsl.so"))
 ;; (define libgsl (load-foreign-library "/home/aartaka/.guix-profile/lib/libgsl.so"))
-
-(define* (foreign-fn name args #:optional (return-type int))
-  "Generate `foreign-library-function' for GSL from a shorter form."
-  (foreign-library-function
-   libgsl name
-   #:return-type return-type
-   #:arg-types args))
 
 (define (strerror errno)
   (pointer->string ((foreign-fn "gsl_strerror" (list int) '*) errno)))

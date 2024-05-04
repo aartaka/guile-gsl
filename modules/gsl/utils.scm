@@ -1,11 +1,13 @@
-(define-module (gsl utils)
+ (define-module (gsl utils)
   #:use-module (gsl core)
   #:use-module (system foreign)
+  #:use-module (system foreign-library)
   #:export (make-c-ptr
             sequence?
             sequence-ref
             sequence-length
-            for-sequence))
+            for-sequence
+            foreign-fn))
 
 (define (sequence? seq)
   (or (list? seq)
@@ -41,3 +43,10 @@
 
 (define* (make-c-ptr type #:optional (val 0))
   (make-c-struct (list type) (list val)))
+
+(define* (foreign-fn name args #:optional (return-type int))
+  "Generate `foreign-library-function' for GSL from a shorter form."
+  (foreign-library-function
+   libgsl name
+   #:return-type return-type
+   #:arg-types args))
