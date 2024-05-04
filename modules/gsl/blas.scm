@@ -1,5 +1,6 @@
 (define-module (gsl blas)
   #:use-module (gsl utils)
+  #:use-module (gsl core)
   #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module ((gsl matrices)  #:prefix mtx:)
   #:use-module (system foreign)
@@ -78,7 +79,14 @@
             syrk
             syr2k!
             dsyr2k!
-            syr2k))
+            syr2k
+            ;; Generic ops
+            gem!
+            gem
+            sym!
+            sym
+            trm!
+            trs!))
 
 (define (check-types . objects)
   (let ((types (map (lambda (obj)
@@ -372,3 +380,54 @@
     (syr2k! amtx bmtx cmtx
             #:beta 0 #:alpha alpha #:transpose transpose #:uplo uplo)
     cmtx))
+
+
+;; Generic operations: both mtx-vec and mtx-mtx
+
+(define* (gem! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
+  (if (mtx:mtx? bsmth)
+      (gemm! amtx bsmth csmth
+             #:alpha alpha #:beta beta
+             #:transpose-a transpose-a #:transpose-b transpose-b)
+      (gemv! amtx bsmth csmth
+             #:alpha alpha #:beta beta
+             #:transpose transpose-a)))
+(define* (gem amtx bsmth #:key (alpha 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
+  (if (mtx:mtx? bsmth)
+      (gemm amtx bsmth
+            #:alpha alpha
+            #:transpose-a transpose-a #:transpose-b transpose-b)
+      (gemv amtx bsmth
+            #:alpha alpha
+            #:transpose transpose-a)))
+
+(define* (sym! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
+  (if (mtx:mtx? bsmth)
+      (symm! amtx bsmth csmth
+             #:alpha alpha #:beta beta
+             #:side side #:uplo uplo)
+      (symv! amtx bsmth csmth
+             #:alpha alpha #:beta beta #:uplo uplo)))
+(define* (sym amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+))
+  (if (mtx:mtx? bsmth)
+      (symm amtx bsmth
+            #:alpha alpha
+            #:side side #:uplo uplo)
+      (symv amtx bsmth
+            #:alpha alpha #:uplo uplo)))
+
+(define* (trm! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+  (if (mtx:mtx? bsmth)
+      (trmm! amtx bsmth
+             #:alpha alpha #:side side
+             #:uplo uplo #:transpose transpose #:diag diag)
+      (trmv! amtx bsmth
+             #:uplo uplo #:transpose transpose #:diag diag)))
+
+(define* (trs! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+  (if (mtx:mtx? bsmth)
+      (trsm! amtx bsmth
+             #:alpha alpha #:side side
+             #:uplo uplo #:transpose transpose #:diag diag)
+      (trsv! amtx bsmth
+             #:uplo uplo #:transpose transpose #:diag diag)))
