@@ -384,6 +384,7 @@
 ;; Generic operations: both mtx-vec and mtx-mtx
 
 (define* (gem! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
+  (check-types amtx bsmth csmth)
   (if (mtx:mtx? bsmth)
       (gemm! amtx bsmth csmth
              #:alpha alpha #:beta beta
@@ -392,6 +393,7 @@
              #:alpha alpha #:beta beta
              #:transpose transpose-a)))
 (define* (gem amtx bsmth #:key (alpha 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
+  (check-types amtx bsmth)
   (if (mtx:mtx? bsmth)
       (gemm amtx bsmth
             #:alpha alpha
@@ -401,6 +403,7 @@
             #:transpose transpose-a)))
 
 (define* (sym! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
+  (check-types amtx bsmth csmth)
   (if (mtx:mtx? bsmth)
       (symm! amtx bsmth csmth
              #:alpha alpha #:beta beta
@@ -408,6 +411,7 @@
       (symv! amtx bsmth csmth
              #:alpha alpha #:beta beta #:uplo uplo)))
 (define* (sym amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+))
+  (check-types amtx bsmth)
   (if (mtx:mtx? bsmth)
       (symm amtx bsmth
             #:alpha alpha
@@ -416,6 +420,7 @@
             #:alpha alpha #:uplo uplo)))
 
 (define* (trm! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+  (check-types amtx bsmth)
   (if (mtx:mtx? bsmth)
       (trmm! amtx bsmth
              #:alpha alpha #:side side
@@ -424,6 +429,7 @@
              #:uplo uplo #:transpose transpose #:diag diag)))
 
 (define* (trs! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+  (check-types amtx bsmth)
   (if (mtx:mtx? bsmth)
       (trsm! amtx bsmth
              #:alpha alpha #:side side
