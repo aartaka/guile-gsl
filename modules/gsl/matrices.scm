@@ -471,11 +471,12 @@ Free the matrix afterwards."
 
 (define (ensure-gsl thing)
   "Turn THING into a GSL-friendly object:
-- Pointer: do nothing.
+- Matrix/vector: do nothing.
 - Vector/list of numbers: turn into a gsl_vector.
 - Vector/list of vectors/lists: turn into a gsl_matrix."
   (cond
-   ((pointer? thing)
+   ((or (mtx? thing)
+        (vec:vec? thing))
     thing)
    ((and (sequence? thing)
          (sequence? (sequence-ref thing 0)))
