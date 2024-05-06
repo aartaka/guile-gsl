@@ -2,6 +2,8 @@
   #:use-module (gsl core)
   #:use-module (system foreign)
   #:use-module (system foreign-library)
+  #:use-module (rnrs base)
+  #:export-syntax (assert-types)
   #:export (make-c-ptr
             sequence?
             sequence-ref
@@ -50,3 +52,7 @@
    libgsl name
    #:return-type return-type
    #:arg-types args))
+
+(define-syntax-rule (assert-types thing type ...)
+  (assert
+   (or (type thing) ...)))
