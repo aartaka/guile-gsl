@@ -6,6 +6,7 @@
   #:use-module (system foreign)
   #:use-module ((gsl vectors) #:prefix vec-)
   #:use-module ((gsl matrices) #:prefix mtx-)
+  #:use-module ((gsl root) #:prefix root:)
   #:use-module (gsl blas)
   #:use-module (gsl stat)
   #:use-module ((gsl eigensystems) #:prefix eigen:))
@@ -194,3 +195,34 @@
 
 (test-assert (< 0.75 (mtx-get (second solutions) 0 0) 0.8))
 (test-end "eigen")
+
+(test-begin "root")
+(define a 1)
+(define b 0)
+(define c -5)
+(define (quadratic x)
+  (+ c (* x (+ b (* a x)))))
+(define (quadratic-df x)
+  (+ b (* 2 a x)))
+(define (quadratic-fdf x)
+  (list (quadratic x)
+        (quadratic-df x)))
+(define approximate-root 5)
+(define solver (root:alloc root:+brent-solver+
+                           #:function quadratic #:upper 5.0 #:lower 0))
+(test-assert (<= 0 (root:iterate! solver) 5))
+(test-assert (<= 1 (root:iterate! solver) 4))
+(test-assert (<= 2 (root:iterate! solver) 3))
+(test-assert (<= 2.1 (root:iterate! solver) 2.3))
+(test-assert (<= 2.2 (root:iterate! solver) 2.25))
+(define polisher (root:alloc root:+newton-polisher+
+                             #:function quadratic
+                             #:derivative quadratic-df
+                             #:function+derivative quadratic-fdf
+                             #:approximate-root approximate-root))
+(test-assert (<= 0 (root:iterate! polisher) 5))
+(test-assert (<= 1 (root:iterate! polisher) 4))
+(test-assert (<= 2 (root:iterate! polisher) 3))
+(test-assert (<= 2.1 (root:iterate! polisher) 2.3))
+(test-assert (<= 2.2 (root:iterate! polisher) 2.25))
+(test-end "root")
