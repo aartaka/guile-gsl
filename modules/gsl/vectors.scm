@@ -277,46 +277,78 @@ DEST can be one of:
       new)))
 
 (define (add! vec1 vec2)
+  "This function adds the elements of vector VEC2 to the elements of vector VEC1.
+The result is stored in VEC1 and VEC2 remains unchanged. The two
+vectors must have the same length."
   ((foreign-fn (dispatch vec1
                          "gsl_vector_add"
                          "gsl_vector_float_add") '(* *) int)
    (unwrap vec1) (unwrap vec2)))
-(define add (act-on-copy add!))
+(define (add vec1 vec2)
+  "Like `add!', but creates a new vector for the result of the addition.
+Both VEC1 and VEC2 are unaffected by the operation."
+  ((act-on-copy add!) vec1 vec2))
 
 (define (subtract! vec1 vec2)
+  "This function subtracts the elements of vector VEC2 from the elements of VEC1.
+The resultis stored in VEC1 and VEC2 remains unchanged.  The two
+vectors must have the same length."
   ((foreign-fn (dispatch vec1
                          "gsl_vector_sub"
                          "gsl_vector_float_sub") '(* *) int)
    (unwrap vec1) (unwrap vec2)))
-(define subtract (act-on-copy subtract!))
+(define (subtract vec1 vec2)
+  "Like `subtract!', but creates a new vector for the result of the subtraction.
+Both VEC1 and VEC2 are unaffected by the operation."
+  ((act-on-copy subtract!) vec1 vec2))
 
 (define (multiply! vec1 vec2)
+  "This function multiplies the elements of vector VEC1 by the elements of vector VEC2.
+The result is stored in VEC1 and VEC2 remains unchanged. The two
+vectors must have the same length."
   ((foreign-fn (dispatch vec1
                          "gsl_vector_mul"
                          "gsl_vector_float_mul") '(* *) int)
    (unwrap vec1) (unwrap vec2)))
-(define multiply (act-on-copy multiply!))
+(define (multiply vec1 vec2)
+  "Like `multiply!', but creates a new vector for the result of the multiplication.
+Both VEC1 and VEC2 are unaffected by the operation."
+  ((act-on-copy multiply!) vec1 vec2))
 
 (define (divide! vec1 vec2)
+  "This function divides the elements of vector VEC1 by the elements of vector VEC2.
+The result is stored in VEC1 and VEC2 remains unchanged. The two
+vectors must have the same length."
   ((foreign-fn (dispatch vec1
                          "gsl_vector_div"
                          "gsl_vector_float_div") '(* *) int)
    (unwrap vec1) (unwrap vec2)))
-(define divide (act-on-copy divide!))
+(define (divide vec1 vec2)
+  "Like `divide!', but creates a new vector for the result of the division.
+Both VEC1 and VEC2 are unaffected by the operation."
+  ((act-on-copy divide!) vec1 vec2))
 
 (define (scale! vec scale)
+  "This function multiplies the elements of VEC by the constant factor SCALE.
+ The result is stored in VEC."
   ((dispatch vec
              (foreign-fn "gsl_vector_scale" `(* ,double) int)
              (foreign-fn "gsl_vector_float_scale" `(* ,float) int))
    (unwrap vec) scale))
-(define scale (act-on-copy scale!))
+(define (scale vec scale)
+  "Like `scale!', but creates a new vector for the result of the scaling."
+  ((act-on-copy scale!) vec scale))
 
 (define (add-constant! vec constant)
+  "This function adds the CONSTANT to the elements of the VEC.
+The result is stored in VEC"
   ((dispatch vec
              (foreign-fn "gsl_vector_add_constant" `(* ,double) int)
              (foreign-fn "gsl_vector_float_add_constant" `(* ,float) int))
    (unwrap vec) constant))
-(define add-constant (act-on-copy add-constant!))
+(define (add-constant vec constant)
+  "Like `add-constant!', but creates a new vector for the result of the scaling."
+  ((act-on-copy add-constant!) vec constant))
 
 (define (axpby! alpha x beta y)
   "Perform αx + βy and store the result in Y."
