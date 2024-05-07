@@ -120,14 +120,17 @@
   "Return a list of (ROWS COLUMNS) in MTX."
   (take (parts mtx) 2))
 (define (rows mtx)
+  "Return number of rows in MTX."
   (first (dimensions mtx)))
 (define (columns mtx)
+  "Return number of columns in MTX."
   (second (dimensions mtx)))
 (define cols columns)
 
 (define %get (foreign-fn "gsl_matrix_get" `(* ,size_t ,size_t) double))
 (define %get-f32 (foreign-fn "gsl_matrix_float_get" `(* ,size_t ,size_t) float))
 (define (get mtx row column)
+  "Get the element at ROW and COLUMN (0-indexed) in MTX."
   ((dispatch mtx
              %get
              %get-f32)
@@ -136,6 +139,7 @@
 (define %set (foreign-fn "gsl_matrix_set" `(* ,size_t ,size_t ,double) void))
 (define %set-f32 (foreign-fn "gsl_matrix_float_set" `(* ,size_t ,size_t ,float) void))
 (define (set! mtx row column val)
+  "Set the MTX[ROW][COLUMN]-th element (0-indexed) to VAL."
   ((dispatch mtx
              %set
              %set-f32)
@@ -151,8 +155,9 @@
 (define* (alloc n-rows n-columns #:optional (fill #f) (type 'f64))
   "Create a new TYPEd ROWSxCOLUMNS matrix.
 FILL might be one of:
-- #f for uninitialized matrix (garbage values, use `calloc' for
-  zero-initialized or numeric FILL for constant-initialized matrices).
+- #f or not provided for uninitialized matrix (garbage values, use
+  `calloc' for zero-initialized or numeric FILL for constant-initialized
+  matrices).
 - Real number to fill the matrix with the same double value.
 - Or a list/vector of lists/vectors with numbers to fill in."
   (let ((mtx (wrap ((foreign-fn (case type
@@ -196,16 +201,17 @@ FILL might be one of:
     (map (compose fn unwrap) (cons mtx mtxs))))
 
 (define (fill! mtx fill)
+  "Set all elements of MTX to FILL."
   ((foreign-fn (dispatch mtx
                          "gsl_matrix_set_all"
                          "gsl_matrix_float_set_all") `(* ,double) void)
    (unwrap mtx) fill))
 
 (define* (copy! src #:optional (dest #t))
-  "Copy the SRC matrix to DEST.
+  "Copy the SRC matrix to DEST and return DEST.
 DEST can be one of:
-- #t to create a new matrix (default).
-- Pointer to copy the SRC into it."
+- #t to create a new matrix (default) and return it.
+- Pointer/matrix to copy the SRC into it."
   (let ((real-dest (cond
                     ((eq? #t dest)
                      (unwrap
@@ -234,6 +240,7 @@ DEST can be one of:
 
 ;; Predicates
 (define (null? mtx)
+  "Are all elements in MTX zero?"
   (< 0 ((foreign-fn (dispatch mtx
                               "gsl_matrix_isnull"
                               "gsl_matrix_float_isnull") '(*) int)
@@ -255,6 +262,7 @@ DEST can be one of:
                               "gsl_matrix_float_isnonneg") '(*) int)
         (unwrap mtx))))
 (define (equal? mtx1 mtx2)
+  "Check whether MTX1 and MTX2 are per-element equal."
   (< 0 ((foreign-fn (dispatch mtx1
                               "gsl_matrix_equal"
                               "gsl_matrix_float_equal") '(* *) int)
@@ -329,7 +337,7 @@ DEST can be one of:
 ;; Row and column operations
 
 (define* (transpose! mtx #:optional (dest #t))
-  "Transpose the MTX depending on DEST value.
+  "Transpose the MTX depending on DEST value and return DEST.
 DEST might be one of:
 - Pointer/matrix: transpose the MTX into the pointed-to matrix
 - #t: Create a new matrix and put the transposed MTX there.
@@ -360,60 +368,92 @@ DEST might be one of:
       new)))
 
 (define (add! mtx1 mtx2)
+  "This function adds the elements of matrix MTX2 to the elements of MTX1.
+The result is stored in MTX1 and MTX2 remains unchanged."
   ((foreign-fn (dispatch mtx1
                          "gsl_matrix_add"
                          "gsl_matrix_float_add") '(* *) int)
    (unwrap mtx1) (unwrap mtx2)))
-(define add (act-on-copy add!))
+(define (add mtx1 mtx2)
+  "Like `add!', but creates and returns a new matrix for the result."
+  ((act-on-copy add!) mtx1 mtx2))
 
 (define (subtract! mtx1 mtx2)
+  "This function subtracts the elements of matrix MTX2 from the elements of matrix MTX1.
+The result is stored in MTX1 and MTX2 remains unchanged."
   ((foreign-fn (dispatch mtx1
                          "gsl_matrix_sub"
                          "gsl_matrix_float_sub") '(* *) int)
    (unwrap mtx1) (unwrap mtx2)))
-(define subtract (act-on-copy subtract!))
+(define (subtract mtx1 mtx2)
+  "Like `subtract!', but creates and returns a new matrix for the result."
+  ((act-on-copy subtract!) mtx1 mtx2))
 
 (define (multiply-elements! mtx1 mtx2)
+  "This function multiplies the elements of matrix MTX1 by the elements of matrix MTX2.
+The result is stored in MTX1 and MTX2 remains unchanged."
   ((foreign-fn (dispatch mtx1
                          "gsl_matrix_mul_elements"
                          "gsl_matrix_float_mul_elements") '(* *) int)
    (unwrap mtx1) (unwrap mtx2)))
-(define multiply-elements (act-on-copy multiply-elements!))
+(define (multiply-elements)
+  "Like `multiply-elements!', but creates and returns a new matrix for the result."
+  ((act-on-copy multiply-elements!) mtx1 mtx2))
 
 (define (divide-elements! mtx1 mtx2)
+  "This function divides the elements of matrix MTX1 by the elements of matrix MTX2.
+The result is stored in MTX1 and MTX2 remains unchanged."
   ((foreign-fn (dispatch mtx1
                          "gsl_matrix_div_elements"
                          "gsl_matrix_float_div_elements") '(* *) int)
    (unwrap mtx1) (unwrap mtx2)))
-(define divide-elements (act-on-copy divide-elements!))
+(define (divide-elements mtx1 mtx2)
+  "Like `divide-elements!', but creates and returns a new matrix for the result."
+  ((act-on-copy divide-elements!) mtx1 mtx2))
 
-(define (scale! mtx1 scalar)
-  ((dispatch mtx1
+(define (scale! mtx scalar)
+  "This function multiplies the elements of matrix MTX by the SCALAR.
+The result is stored in MTX."
+  ((dispatch mtx
              (foreign-fn "gsl_matrix_scale" `(* ,double) int)
              (foreign-fn "gsl_matrix_float_scale" `(* ,float) int))
-   (unwrap mtx1) scalar))
-(define scale (act-on-copy scale!))
+   (unwrap mtx) scalar))
+(define (scale mtx scalar)
+  "Like `scale!', but creates and returns a new matrix for the result."
+  ((act-on-copy scale!) mtx scalar))
 
 (define (scale-columns! mtx vec)
+  "This function scales the columns of the M-by-N MTX MTX by the elements of the VEC, of length N.
+The j-th column of MTX is multiplied by VEC[j]."
   ((foreign-fn (dispatch mtx
                          "gsl_matrix_scale_columns"
                          "gsl_matrix_float_scale_columns") '(* *) int)
    (unwrap mtx) (vec:unwrap vec)))
-(define scale-columns (act-on-copy scale-columns!))
+(define (scale-columns mtx vec)
+  "Like `scale-columns!', but creates and returns a new matrix for the result."
+  ((act-on-copy scale-columns!) mtx vec))
 
 (define (scale-rows! mtx vec)
+  "This function scales the rows of the M-by-N MTX by the elements of the VEC, of length M.
+The i-th row of MTX is multiplied by VEC[i]."
   ((foreign-fn (dispatch mtx
                          "gsl_matrix_scale_rows"
                          "gsl_matrix_float_scale_rows") '(* *) int)
    (unwrap mtx) (vec:unwrap vec)))
-(define scale-rows (act-on-copy scale-rows!))
+(define (scale-rows mtx vec)
+  "Like `scale-rows!', but creates and returns a new matrix for the result."
+  ((act-on-copy scale-rows!) mtx vec))
 
 (define (add-constant! mtx constant)
+  "This function adds the CONSTANT the elements of the matrix MTX.
+The result is stored in MTX."
   ((dispatch mtx
              (foreign-fn "gsl_matrix_add_constant" `(* ,double) int)
              (foreign-fn "gsl_matrix_float_add_constant" `(* ,float) int))
    (unwrap mtx) constant))
-(define add-constant (act-on-copy add-constant!))
+(define (add-constant mtx constant)
+  "Like `add-constant!', but creates and returns a new matrix for the result."
+  (act-on-copy add-constant!))
 
 ;; TODO: call-with-copy
 (define* (call-with-mtx rows columns thunk #:optional (fill #f) (type 'f64))

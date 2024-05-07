@@ -27,3 +27,13 @@ Modifies the MTX."
      (mtx:unwrap mtx) (vec:unwrap evalues-vec) (mtx:unwrap evectors-mtx) workspace)
     (free workspace)
     (list evalues-vec evectors-mtx)))
+(define* (solve mtx #:key
+                 (evalues-vec (vec:alloc (mtx:columns mtx)))
+                 (evectors-mtx (mtx:alloc (mtx:columns mtx) (mtx:columns mtx))))
+  "Same as `solve!' but creates a new matrix for computations.
+MTX remains unchanged."
+  (let ((copy (mtx:copy! mtx))
+        (result (solve! copy
+                        #:evalues-vec evalues-vec #:evectors-mtx evectors-mtx)))
+    (mtx:free copy)
+    result))

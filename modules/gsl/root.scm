@@ -75,6 +75,7 @@
             (root polisher))))
 
 (define (name solver/polisher)
+  "Name (e.g. \"bisection\", \"newton\") for the SOLVER/POLISHER method."
   (assert-types solver/polisher solver? polisher?)
   (pointer->string
    (if (solver? solver/polisher)
@@ -84,6 +85,7 @@
         (unwrap-polisher polisher)))))
 
 (define (root solver/polisher)
+  "Current approximation of root in SOLVER/POLISHER."
   (assert-types solver/polisher solver? polisher?)
   (if (solver? solver/polisher)
       ((foreign-fn "gsl_root_fsolver_root" '(*) double)
@@ -145,7 +147,16 @@
              function+derivative)
          %null-pointer)))
 
-(define* (alloc solver/polisher #:key (function #f) (derivative #f) (function+derivative #f) approximate-root upper lower)
+(define* (alloc solver/polisher
+                #:key (function #f) (derivative #f)
+                (function+derivative (lambda (x) (list (function x) (derivative x))))
+                approximate-root upper lower)
+  "Create a new SOLVER/POLISHER and initialize it.
+For solvers, provide FUNCTION, UPPER, and LOWER.
+For polishers, provide FUNCTION, DERIVATIVE, APPROXIMATE-ROOT, and,
+optionally, FUNCTION+DERIVATIVE.
+FUNCTION, DERIVATIVE, and FUNCTION+DERIVATIVE can be procedures or
+pointers to foreign functions."
   (assert-types solver/polisher pointer?)
   (assert-types function pointer? procedure? false?)
   (cond
@@ -182,6 +193,8 @@
      (unwrap-polisher solver/polisher)))))
 
 (define (iterate! solver/polisher)
+  "Iterate on SOLVER/POLISHER once.
+Return current root approximation if successful, #f on error."
   (assert-types solver/polisher solver? polisher?)
   (let ((code (if (solver? solver/polisher)
                   ((foreign-fn "gsl_root_fsolver_iterate" '(*) int)
@@ -195,23 +208,29 @@
       #f))))
 
 (define (test-interval solver/polisher absolute-error relative-error)
+  "Test that SOLVER/POLISHER upper/lower bounds are converging with *-ERRORs."
   (zero? ((foreign-fn "gsl_root_test_interval" (list double double double double) int)
           (lower-bound solver/polisher) (upper-bound solver/polisher)
           absolute-error relative-error)))
 (define (test-delta x0 x1 absolute-error relative-error)
+  "Test that X0 and X1 are converging with *-ERRORs."
   (zero? ((foreign-fn "gsl_root_test_delta" (list double double double double) int)
           x0 x1 absolute-error relative-error)))
 (define (test-residual f absolute-error)
+  "Test the residual value F against the ABSOLUTE-ERROR bound."
   (zero? ((foreign-fn "gsl_root_test_residual" (list double double) int)
           f absolute-error)))
 
 (define (call-with solver/polisher thunk . args)
+  "Call THUNK with newly `alloc'-ated SOLVER/POLISHER.
+Free it automatically and return result of THUNK."
   (let* ((solver/polisher (apply alloc solver/polisher args))
          (result (thunk solver/polisher)))
     (free solver/polisher)
     result))
 
 (define-syntax-rule (with (var solver/polisher args ...) body ...)
+  "Run the BODY with VAR bound to newly allocated SOLVER/POLISHER (with ARGS)."
   (call-with
    solver/polisher
    (lambda (var)
