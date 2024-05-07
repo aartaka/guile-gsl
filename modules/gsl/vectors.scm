@@ -130,7 +130,8 @@ FILL might be one of:
 - #f for uninitialized vector (garbage values, use `calloc' for
   zero-initialized or numeric FILL for constant-initialized vector).
 - Real number to fill the vector with the same double value.
-- Scheme vector/list of real numbers."
+- Scheme vector/list of real numbers.
+- Another allocated vector to copy the contents."
   (let ((vec (wrap ((foreign-fn (case type
                                   ((f64) "gsl_vector_alloc")
                                   ((f32) "gsl_vector_float_alloc")) (list size_t) '*)
@@ -149,6 +150,8 @@ FILL might be one of:
            (when (< idx (length vec))
              (set! vec idx elem)))
          fill))
+       ((vec? fill)
+        (copy! fill vec))
        (else
         (error "Don't know how to fill a vector with" fill))))
     vec))

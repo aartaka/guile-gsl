@@ -159,7 +159,8 @@ FILL might be one of:
   `calloc' for zero-initialized or numeric FILL for constant-initialized
   matrices).
 - Real number to fill the matrix with the same double value.
-- Or a list/vector of lists/vectors with numbers to fill in."
+- A list/vector of lists/vectors with numbers to fill in.
+- Or another allocated matrix to copy its contents."
   (let ((mtx (wrap ((foreign-fn (case type
                                   ((f64) "gsl_matrix_alloc")
                                   ((f32) "gsl_matrix_alloc"))
@@ -183,6 +184,8 @@ FILL might be one of:
                 (set! mtx row column elem)))
             vec))
          fill))
+       ((mtx? fill)
+        (copy! fill mtx))
        (else
         (error "Don't know how to fill a matrix with" fill))))
     mtx))
