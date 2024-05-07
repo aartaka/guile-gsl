@@ -156,17 +156,17 @@
       (cond
        ((and function upper lower)
         ((foreign-fn "gsl_root_fsolver_set" `(* * ,double ,double) int)
-         solver (wrap-solver-function function) lower upper))
+         solver/polisher (wrap-solver-function function) lower upper))
        ((or function upper lower)
         (warn "Expecting FUNCTION, a LOWER bound, and an UPPER bound.")))
       (cond
        ((and function derivative approximate-root)
         ((foreign-fn "gsl_root_fdfsolver_set" `(* * ,double) int)
-         polisher (wrap-polisher-function
-                   function derivative
-                   (or function+derivative
-                       (lambda (x) (list (function x)
-                                         (derivative x)))))
+         solver/polisher (wrap-polisher-function
+                          function derivative
+                          (or function+derivative
+                              (lambda (x) (list (function x)
+                                                (derivative x)))))
          approximate-root))
        ((or function derivative function+derivative approximate-root)
         (warn "Expecting at least FUNCTION, DERIVATIVE, and APPROXIMATE-ROOT.")))))
