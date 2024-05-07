@@ -56,7 +56,7 @@
 (define +steffenson-polisher+
   (deref (foreign-library-pointer libgsl "gsl_root_fdfsolver_secant")))
 
-(define-wrapped-pointer-type solver
+(define-wrapped-pointer-type <solver>
   solver?
   wrap-solver unwrap-solver
   (lambda (solver p)
@@ -66,7 +66,7 @@
             (lower-bound solver)
             (root solver)
             (upper-bound solver))))
-(define-wrapped-pointer-type polisher
+(define-wrapped-pointer-type <polisher>
   polisher?
   wrap-polisher unwrap-polisher
   (lambda (polisher p)
