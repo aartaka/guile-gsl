@@ -67,7 +67,7 @@
 (set-record-type-printer!
  <vec>
  (lambda (v p)
-   (format p "#<gsl_vector~a of ~d of ~a>"
+   (format p "#<gsl_vector~a of ~d ~a>"
            (if (eq? 'f32 (type v))
                "_float"
                "")
