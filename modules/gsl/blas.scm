@@ -322,7 +322,8 @@
                          0 (mtx:type amtx))))
     (gemm! amtx bmtx cmtx
            #:beta 0 #:alpha alpha
-           #:transpose-a transpose-a #:transpose-b transpose-b)))
+           #:transpose-a transpose-a #:transpose-b transpose-b)
+    cmtx))
 
 (define* (symm! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
   (check-types amtx bmtx cmtx)
