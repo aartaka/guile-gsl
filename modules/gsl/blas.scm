@@ -318,7 +318,12 @@
 (define* (gemm amtx bmtx #:key (alpha 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
   "Non-destructive version of `gemm!', creating and returning CMTX."
   (check-types amtx bmtx)
-  (let ((cmtx (mtx:alloc (mtx:rows amtx) (mtx:columns bmtx)
+  (let ((cmtx (mtx:alloc (if (= +no-transpose+ transpose-a)
+                             (mtx:rows amtx)
+                             (mtx:columns amtx))
+                         (if (= +no-transpose+ transpose-b)
+                             (mtx:columns bmtx)
+                             (mtx:rows bmtx))
                          0 (mtx:type amtx))))
     (gemm! amtx bmtx cmtx
            #:beta 0 #:alpha alpha
