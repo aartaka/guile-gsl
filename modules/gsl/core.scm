@@ -5,6 +5,8 @@
   #:export (libgsl
             libgslcblas
             set-error-handler
+            set-error-handler!
+            set-error-handler-off!
             strerror))
 
 (define libgslcblas (load-foreign-library "libgslcblas.so" #:global? #t))
@@ -19,7 +21,13 @@
                               #:return-type '*)
     errno)))
 
-(define (set-error-handler handler)
+(define (set-error-handler-off!)
+  ((foreign-library-function
+    libgsl "gsl_set_error_handler_off"
+    #:arg-types '()
+    #:return-type '*)))
+
+(define (set-error-handler! handler)
   "Bind a new HANDLER as GSL error handler.
 HANDLER must be an (#:optional reason file line errno #:rest etc)
 procedure. A more relaxed arglist of (reason file line errno) is fine
@@ -36,6 +44,7 @@ according to GSL docs, but is unreliable in practice."
       `(* * ,int ,int)))
     ((pointer? handler)
      handler))))
+(define set-error-handler set-error-handler!)
 
 ;; (set-error-handler
 ;;  (lambda* (#:optional (reason "unknown reason") (file "unknown-file") (line -1) (errno -1) #:rest rest)
