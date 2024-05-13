@@ -148,25 +148,27 @@
              function+derivative)
          %null-pointer)))
 
-(define* (set! solver/polisher solver?
+(define* (set! solver/polisher
                #:key (function #f) (derivative #f)
                (function+derivative #f)
                approximate-root upper lower)
-  (if solver?
+  (if (solver? solver/polisher)
       (cond
        ((and function upper lower)
         ((foreign-fn "gsl_root_fsolver_set" `(* * ,double ,double) int)
-         solver/polisher (wrap-solver-function function) lower upper))
+         (unwrap-solver solver/polisher)
+         (wrap-solver-function function) lower upper))
        ((or function upper lower)
         (warn "Expecting FUNCTION, a LOWER bound, and an UPPER bound.")))
       (cond
        ((and function derivative approximate-root)
         ((foreign-fn "gsl_root_fdfsolver_set" `(* * ,double) int)
-         solver/polisher (wrap-polisher-function
-                          function derivative
-                          (or function+derivative
-                              (lambda (x) (list (function x)
-                                                (derivative x)))))
+         (unwrap-polisher solver/polisher)
+         (wrap-polisher-function
+          function derivative
+          (or function+derivative
+              (lambda (x) (list (function x)
+                                (derivative x)))))
          approximate-root))
        ((or function derivative function+derivative approximate-root)
         (warn "Expecting at least FUNCTION, DERIVATIVE, and APPROXIMATE-ROOT.")))))
@@ -182,24 +184,29 @@ optionally, FUNCTION+DERIVATIVE.
 FUNCTION, DERIVATIVE, and FUNCTION+DERIVATIVE can be procedures or
 pointers to foreign functions."
   (assert-types solver/polisher pointer?)
-  (assert-types function pointer? procedure? false?)
+  (assert-types function pointer? procedure?)
   (cond
    ((member solver/polisher
             (list +bisection-solver+ +false-position-solver+ +brent-solver+))
-    (let ((solver ((foreign-fn "gsl_root_fsolver_alloc" '(*) '*)
-                   solver/polisher)))
-      (set! solver #t #:function function #:lower lower #:upper upper)
-      (wrap-solver solver)))
+    (let ((solver (wrap-solver
+                   ((foreign-fn "gsl_root_fsolver_alloc" '(*) '*)
+                    solver/polisher))))
+      (error (format #f "Solver allocated: ~s" solver))
+      (set! solver
+            #:function function #:lower lower #:upper upper)
+      solver))
    ((member solver/polisher
             (list +newton-polisher+ +secant-polisher+ +steffenson-polisher+))
-    (let ((polisher ((foreign-fn "gsl_root_fdfsolver_alloc" '(*) '*)
-                     solver/polisher)))
-      (set! polisher #f
+    (let ((polisher (wrap-polisher
+                     ((foreign-fn "gsl_root_fdfsolver_alloc" '(*) '*)
+                      solver/polisher))))
+      (error (format #f "Polisher allocated: ~s" polisher))
+      (set! polisher
             #:function function
             #:derivative derivative
             #:function+derivative function+derivative
             #:approximate-root approximate-root)
-      (wrap-polisher polisher)))
+      polisher))
    (else
     (error 'alloc (format #f "Cannot create a solver for type ~s" solver/polisher)))))
 (define make alloc)
