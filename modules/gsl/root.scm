@@ -191,7 +191,6 @@ pointers to foreign functions."
     (let ((solver (wrap-solver
                    ((foreign-fn "gsl_root_fsolver_alloc" '(*) '*)
                     solver/polisher))))
-      (error (format #f "Solver allocated: ~s" solver))
       (set! solver
             #:function function #:lower lower #:upper upper)
       solver))
@@ -200,7 +199,6 @@ pointers to foreign functions."
     (let ((polisher (wrap-polisher
                      ((foreign-fn "gsl_root_fdfsolver_alloc" '(*) '*)
                       solver/polisher))))
-      (error (format #f "Polisher allocated: ~s" polisher))
       (set! polisher
             #:function function
             #:derivative derivative
