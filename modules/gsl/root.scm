@@ -148,10 +148,11 @@
              function+derivative)
          %null-pointer)))
 
-(define* (set! solver/polisher
-               #:key (function #f) (derivative #f)
-               (function+derivative #f)
-               approximate-root upper lower)
+
+(define* (modify! solver/polisher
+                  #:key (function #f) (derivative #f)
+                  (function+derivative #f)
+                  approximate-root upper lower)
   (if (solver? solver/polisher)
       (cond
        ((and function upper lower)
@@ -172,6 +173,8 @@
          approximate-root))
        ((or function derivative function+derivative approximate-root)
         (warn "Expecting at least FUNCTION, DERIVATIVE, and APPROXIMATE-ROOT.")))))
+(define set! modify!)
+(define reset! modify!)
 
 (define* (alloc solver/polisher
                 #:key (function #f) (derivative #f)
@@ -191,19 +194,19 @@ pointers to foreign functions."
     (let ((solver (wrap-solver
                    ((foreign-fn "gsl_root_fsolver_alloc" '(*) '*)
                     solver/polisher))))
-      (set! solver
-            #:function function #:lower lower #:upper upper)
+      (modify! solver
+               #:function function #:lower lower #:upper upper)
       solver))
    ((member solver/polisher
             (list +newton-polisher+ +secant-polisher+ +steffenson-polisher+))
     (let ((polisher (wrap-polisher
                      ((foreign-fn "gsl_root_fdfsolver_alloc" '(*) '*)
                       solver/polisher))))
-      (set! polisher
-            #:function function
-            #:derivative derivative
-            #:function+derivative function+derivative
-            #:approximate-root approximate-root)
+      (modify! polisher
+               #:function function
+               #:derivative derivative
+               #:function+derivative function+derivative
+               #:approximate-root approximate-root)
       polisher))
    (else
     (error 'alloc (format #f "Cannot create a solver for type ~s" solver/polisher)))))
