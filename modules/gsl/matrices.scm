@@ -32,6 +32,7 @@
             free
             copy!
             fill!
+            identity!
             ->2d-vector
             ;; Predicates
             null?
@@ -210,6 +211,13 @@ FILL might be one of:
                          "gsl_matrix_set_all"
                          "gsl_matrix_float_set_all") `(* ,double) void)
    (unwrap mtx) fill))
+(define (identity! mtx)
+  "Turn MTX into an identity matrix.
+All zeros except ones on the main diagonal."
+  ((foreign-fn (dispatch mtx
+                         "gsl_matrix_set_identity"
+                         "gsl_matrix_float_set_identity") `(*) void)
+   (unwrap mtx)))
 
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC matrix to DEST and return DEST.

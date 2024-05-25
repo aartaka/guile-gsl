@@ -26,6 +26,7 @@
             free
             copy!
             fill!
+            basis!
             ->vector
             ;; Predicates
             null?
@@ -176,6 +177,14 @@ FILL might be one of:
              (foreign-fn "gsl_vector_set_all" `(* ,double) void)
              (foreign-fn "gsl_vector_float_set_all" `(* ,float) void))
    (unwrap vec) fill))
+(define (basis! vec i)
+  "Turn VEC into a basis (all zeros except I-th elem) vector."
+  ((foreign-fn
+    (dispatch vec
+              "gsl_vector_set_basis"
+              "gsl_vector_float_set_basis")
+    `(* ,size_t) int)
+   (unwrap vec) i))
 
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC vector to DEST.
