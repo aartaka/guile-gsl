@@ -31,6 +31,7 @@
             calloc
             free
             copy!
+            fill!
             ->2d-vector
             ;; Predicates
             null?
