@@ -177,14 +177,18 @@ FILL might be one of:
              (foreign-fn "gsl_vector_set_all" `(* ,double) void)
              (foreign-fn "gsl_vector_float_set_all" `(* ,float) void))
    (unwrap vec) fill))
-(define (basis! vec i)
-  "Turn VEC into a basis (all zeros except I-th elem) vector."
-  ((foreign-fn
-    (dispatch vec
-              "gsl_vector_set_basis"
-              "gsl_vector_float_set_basis")
-    `(* ,size_t) int)
-   (unwrap vec) i))
+(define* (basis! #:optional vec i size)
+  "Turn VEC into a basis (all zeros except I-th elem) vector.
+If VEC is #f, create a new vector of SIZE and make it a basis.
+In either case, return the resultant basis vector."
+  (let ((vec (or vec (alloc size))))
+    ((foreign-fn
+      (dispatch vec
+                "gsl_vector_set_basis"
+                "gsl_vector_float_set_basis")
+      `(* ,size_t) int)
+     (unwrap vec) i)
+    vec))
 
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC vector to DEST.

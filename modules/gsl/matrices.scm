@@ -211,13 +211,17 @@ FILL might be one of:
                          "gsl_matrix_set_all"
                          "gsl_matrix_float_set_all") `(* ,double) void)
    (unwrap mtx) fill))
-(define (identity! mtx)
+(define* (identity! #:optional mtx rows columns)
   "Turn MTX into an identity matrix.
-All zeros except ones on the main diagonal."
-  ((foreign-fn (dispatch mtx
-                         "gsl_matrix_set_identity"
-                         "gsl_matrix_float_set_identity") `(*) void)
-   (unwrap mtx)))
+(All zeros except ones on the main diagonal.)
+In case MTX if #f, create a new one of ROWSxCOLUMNS.
+In either case, return resultant identity matrix."
+  (let ((mtx (or mtx (alloc rows columns))))
+    ((foreign-fn (dispatch mtx
+                           "gsl_matrix_set_identity"
+                           "gsl_matrix_float_set_identity") `(*) void)
+     (unwrap mtx))
+    mtx))
 
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC matrix to DEST and return DEST.
