@@ -118,6 +118,14 @@
 (define +left+ 141)
 (define +right+ 142)
 
+(define (ensure-transpose transpose?)
+  (assert-types transpose? boolean? integer?)
+  (if (integer? transpose?)
+      transpose?
+      (if transpose?
+          +transpose+
+          +no-transpose+)))
+
 ;; FIXME: No complex, only float and double for now
 
 (define* (blas-fn name arg-types #:optional (return-type int))
@@ -219,17 +227,17 @@
   ((dispatch amtx
              (blas-fn "dgemv" `(,int ,double * * ,double *))
              (blas-fn "sgemv" `(,int ,float * * ,float *)))
-   transpose alpha (mtx:unwrap amtx) (vec:unwrap xvec) beta (vec:unwrap yvec)))
+   (ensure-transpose transpose) alpha (mtx:unwrap amtx) (vec:unwrap xvec) beta (vec:unwrap yvec)))
 (define dgemv! gemv!)
 (define* (gemv amtx xvec #:key (alpha 1.0) (transpose +no-trans+))
   "Non-destructive `gemv!', creating and returning YVEC."
   (check-types amtx xvec)
-  (let ((yvec (vec:alloc (if (= transpose +no-trans+)
+  (let ((yvec (vec:alloc (if (= (ensure-transpose transpose) +no-trans+)
                              (mtx:columns amtx)
                              (mtx:rows amtx))
                          0 (mtx:type amtx))))
     (gemv! amtx xvec yvec
-           #:beta 0  #:alpha alpha #:transpose transpose)
+           #:beta 0  #:alpha alpha #:transpose (ensure-transpose transpose))
     yvec))
 
 (define* (trmv! amtx xvec #:key (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
@@ -237,7 +245,7 @@
   ((blas-fn (dispatch amtx
                       "dtrmv"
                       "strmv") `(,int ,int ,int * *))
-   uplo transpose diag (mtx:unwrap amtx) (vec:unwrap xvec)))
+   uplo (ensure-transpose transpose) diag (mtx:unwrap amtx) (vec:unwrap xvec)))
 (define dtrmv! trmv!)
 
 (define* (trsv! amtx xvec #:key (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
@@ -245,7 +253,7 @@
   ((blas-fn (dispatch amtx
                       "dtrsv"
                       "strsv") `(,int ,int ,int * *))
-   uplo transpose diag (mtx:unwrap amtx) (vec:unwrap xvec)))
+   uplo (ensure-transpose transpose) diag (mtx:unwrap amtx) (vec:unwrap xvec)))
 (define dtrsv! trsv!)
 
 (define* (symv! amtx xvec yvec #:key (uplo +upper+) (alpha 1.0) (beta 1.0))
@@ -313,21 +321,23 @@
   ((dispatch amtx
              (blas-fn "dgemm" `(,int ,int ,double * * ,double *))
              (blas-fn "sgemm" `(,int ,int ,float * * ,float *)))
-   transpose-a transpose-b alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
+   (ensure-transpose transpose-a) (ensure-transpose transpose-b)
+   alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
 (define dgemm! gemm!)
 (define* (gemm amtx bmtx #:key (alpha 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
   "Non-destructive version of `gemm!', creating and returning CMTX."
   (check-types amtx bmtx)
-  (let ((cmtx (mtx:alloc (if (= +no-transpose+ transpose-a)
+  (let ((cmtx (mtx:alloc (if (= +no-transpose+ (ensure-transpose transpose-a))
                              (mtx:rows amtx)
                              (mtx:columns amtx))
-                         (if (= +no-transpose+ transpose-b)
+                         (if (= +no-transpose+ (ensure-transpose transpose-b))
                              (mtx:columns bmtx)
                              (mtx:rows bmtx))
                          0 (mtx:type amtx))))
     (gemm! amtx bmtx cmtx
            #:beta 0 #:alpha alpha
-           #:transpose-a transpose-a #:transpose-b transpose-b)
+           #:transpose-a (ensure-transpose transpose-a)
+           #:transpose-b (ensure-transpose transpose-b))
     cmtx))
 
 (define* (symm! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
@@ -352,7 +362,8 @@
   ((dispatch amtx
              (blas-fn "dtrmm" `(,int ,int ,int ,int ,double * *))
              (blas-fn "strmm" `(,int ,int ,int ,int ,float * *)))
-   side uplo transpose diag alpha (mtx:unwrap amtx) (mtx:unwrap bmtx)))
+   side uplo (ensure-transpose transpose) diag
+   alpha (mtx:unwrap amtx) (mtx:unwrap bmtx)))
 (define dtrmm! trmm!)
 
 (define* (trsm! amtx bmtx #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
@@ -360,7 +371,8 @@
   ((dispatch amtx
              (blas-fn "dtrsm" `(,int ,int ,int ,int ,double * *))
              (blas-fn "strsm" `(,int ,int ,int ,int ,float * *)))
-   side uplo transpose diag alpha (mtx:unwrap amtx) (mtx:unwrap bmtx)))
+   side uplo (ensure-transpose transpose) diag
+   alpha (mtx:unwrap amtx) (mtx:unwrap bmtx)))
 (define dtrsm! trsm!)
 
 (define* (syrk! amtx cmtx #:key (alpha 1.0) (beta 1.0) (uplo +upper+) (transpose +no-trans+))
@@ -368,12 +380,14 @@
   ((dispatch amtx
              (blas-fn "dsyrk" `(,int ,int ,double * ,double *))
              (blas-fn "ssyrk" `(,int ,int ,float * ,float *)))
-   uplo transpose alpha (mtx:unwrap amtx) beta (mtx:unwrap cmtx)))
+   uplo (ensure-transpose transpose)
+   alpha (mtx:unwrap amtx) beta (mtx:unwrap cmtx)))
 (define dsyrk! syrk!)
 (define* (syrk amtx #:key (alpha 1.0) (uplo +upper+) (transpose +no-trans+))
   "Non-destructive `syrk!' creating and returning a CMTX."
   (let ((cmtx (mtx:alloc (mtx:rows amtx) (mtx:rows amtx) 0 (mtx:type amtx))))
-    (syrk! amtx cmtx #:beta 0 #:alpha alpha #:uplo uplo #:transpose transpose)
+    (syrk! amtx cmtx #:beta 0 #:alpha alpha
+           #:uplo uplo #:transpose (ensure-transpose transpose))
     cmtx))
 
 (define* (syr2k! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (transpose +no-trans+) (uplo +upper+))
@@ -381,18 +395,20 @@
   ((dispatch amtx
              (blas-fn "dsyr2k" `(,int ,int ,double * * ,double *))
              (blas-fn "ssyr2k" `(,int ,int ,float * * ,float *)))
-   uplo transpose alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
+   uplo (ensure-transpose transpose)
+   alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
 (define dsyr2k! syr2k!)
 (define* (syr2k amtx bmtx #:key (alpha 1.0) (transpose +no-trans+) (uplo +upper+))
   "Non-destructive version of `syr2k!', creating and returning CMTX."
   (check-types amtx bmtx)
-  (let ((cmtx (if (= transpose +no-trans+)
+  (let ((cmtx (if (= (ensure-transpose transpose) +no-trans+)
                   (mtx:alloc (mtx:rows amtx) (mtx:rows amtx)
                              0 (mtx:type amtx))
                   (mtx:alloc (mtx:columns amtx) (mtx:columns amtx)
                              0 (mtx:type amtx)))))
     (syr2k! amtx bmtx cmtx
-            #:beta 0 #:alpha alpha #:transpose transpose #:uplo uplo)
+            #:beta 0 #:alpha alpha
+            #:transpose (ensure-transpose transpose) #:uplo uplo)
     cmtx))
 
 
@@ -404,10 +420,11 @@
   (if (mtx:mtx? bsmth)
       (gemm! amtx bsmth csmth
              #:alpha alpha #:beta beta
-             #:transpose-a transpose-a #:transpose-b transpose-b)
+             #:transpose-a (ensure-transpose transpose-a)
+             #:transpose-b (ensure-transpose transpose-b))
       (gemv! amtx bsmth csmth
              #:alpha alpha #:beta beta
-             #:transpose transpose-a)))
+             #:transpose (ensure-transpose transpose-a))))
 (define* (gem amtx bsmth #:key (alpha 1.0) (transpose-a +no-trans+) (transpose-b +no-trans+))
   "Non-destructive version of `gem!'.
 Returns CSMTH, matrix of vector."
@@ -415,10 +432,11 @@ Returns CSMTH, matrix of vector."
   (if (mtx:mtx? bsmth)
       (gemm amtx bsmth
             #:alpha alpha
-            #:transpose-a transpose-a #:transpose-b transpose-b)
+            #:transpose-a (ensure-transpose transpose-a)
+            #:transpose-b (ensure-transpose transpose-b))
       (gemv amtx bsmth
             #:alpha alpha
-            #:transpose transpose-a)))
+            #:transpose (ensure-transpose transpose-a))))
 
 (define* (sym! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
   "Symmetric AMTX multiply by BSMTH.
@@ -448,9 +466,9 @@ If BSMTH is a matrix, use `trmm!', otherwise `trmv!'."
   (if (mtx:mtx? bsmth)
       (trmm! amtx bsmth
              #:alpha alpha #:side side
-             #:uplo uplo #:transpose transpose #:diag diag)
+             #:uplo uplo #:transpose (ensure-transpose transpose) #:diag diag)
       (trmv! amtx bsmth
-             #:uplo uplo #:transpose transpose #:diag diag)))
+             #:uplo uplo #:transpose (ensure-transpose transpose) #:diag diag)))
 
 (define* (trs! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   "Multiplication of inverse of AMTX by BSMTH.
@@ -459,6 +477,6 @@ Use `trsm!' if BSMTH is matrix, `trsv!' otherwise."
   (if (mtx:mtx? bsmth)
       (trsm! amtx bsmth
              #:alpha alpha #:side side
-             #:uplo uplo #:transpose transpose #:diag diag)
+             #:uplo uplo #:transpose (ensure-transpose transpose) #:diag diag)
       (trsv! amtx bsmth
-             #:uplo uplo #:transpose transpose #:diag diag)))
+             #:uplo uplo #:transpose (ensure-transpose transpose) #:diag diag)))
