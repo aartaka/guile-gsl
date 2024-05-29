@@ -37,7 +37,8 @@
             test-delta
             test-residual
             ;; Utilities
-            call-with))
+            call-with
+            optimize))
 
 (define (deref ptr)
   (car (parse-c-struct ptr '(*))))
