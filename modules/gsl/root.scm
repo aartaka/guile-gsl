@@ -259,6 +259,45 @@ Free it automatically and return result of THUNK."
     (free solver/polisher)
     result))
 
+(define* (optimize solver/polisher iterations relative-error . args)
+  "Return the root (or #f) for SOLVER/POLISHER.
+Find it in under ITERATIONS, guided by RELATIVE-ERROR.
+ARGS are as per `alloc' for SOLVER/POLISHER.
+
+Example from GSL docs might be rewritten as:
+(let ((a 1)
+      (b 0)
+      (c -5))
+  (optimize
+   +newton-polisher+ 100 0.001
+   #:function (lambda (x)
+                (+ (* a x x)
+                   (* b x)
+                   c))
+   #:derivative (lambda (x)
+                  (+ (* 2 a x)
+                     b))
+   #:approximate-root 5))"
+  (apply
+   call-with
+   solver/polisher
+   (lambda (solver/polisher)
+     (do ((i 0 (1+ i))
+          (approximation (iterate! solver/polisher)
+                         (iterate! solver/polisher))
+          (prev-approximation #f approximation))
+         ((or (= i iterations)
+              (cond
+               ((solver? solver/polisher)
+                (test-interval solver/polisher 0 relative-error))
+               (prev-approximation
+                (test-delta prev-approximation approximation 0 relative-error))
+               (else
+                #f))
+              (eq? #f approximation))
+          approximation)))
+   args))
+
 (define-syntax-rule (with (var solver/polisher args ...) body ...)
   "Run the BODY with VAR bound to newly allocated SOLVER/POLISHER (with ARGS)."
   (call-with
