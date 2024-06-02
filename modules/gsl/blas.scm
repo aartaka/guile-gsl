@@ -340,14 +340,14 @@
            #:transpose-b (ensure-transpose transpose-b))
     cmtx))
 
-(define* (symm! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
+(define* (symm! amtx bmtx cmtx #:key (alpha 1.0) (beta 1.0) (side +left+) (uplo +upper+))
   (check-types amtx bmtx cmtx)
   ((dispatch amtx
              (blas-fn "dsymm" `(,int ,int ,double * * ,double *))
              (blas-fn "dsymm" `(,int ,int ,float * * ,float *)))
    side uplo alpha (mtx:unwrap amtx) (mtx:unwrap bmtx) beta (mtx:unwrap cmtx)))
 (define dsymm! symm!)
-(define* (symm amtx bmtx #:key (alpha 1.0) (side +right+) (uplo +upper+))
+(define* (symm amtx bmtx #:key (alpha 1.0) (side +left+) (uplo +upper+))
   "Non-destructive version of `symm!', creating and returning CMTX."
   (check-types amtx bmtx)
   (let ((cmtx (if (= side +right+)
@@ -357,7 +357,7 @@
            #:beta 0 #:alpha alpha #:side side #:uplo uplo)
     cmtx))
 
-(define* (trmm! amtx bmtx #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+(define* (trmm! amtx bmtx #:key (alpha 1.0) (side +left+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   (check-types amtx bmtx)
   ((dispatch amtx
              (blas-fn "dtrmm" `(,int ,int ,int ,int ,double * *))
@@ -366,7 +366,7 @@
    alpha (mtx:unwrap amtx) (mtx:unwrap bmtx)))
 (define dtrmm! trmm!)
 
-(define* (trsm! amtx bmtx #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+(define* (trsm! amtx bmtx #:key (alpha 1.0) (side +left+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   (check-types amtx bmtx)
   ((dispatch amtx
              (blas-fn "dtrsm" `(,int ,int ,int ,int ,double * *))
@@ -438,7 +438,7 @@ Returns CSMTH, matrix of vector."
             #:alpha alpha
             #:transpose (ensure-transpose transpose-a))))
 
-(define* (sym! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (side +right+) (uplo +upper+))
+(define* (sym! amtx bsmth csmth #:key (alpha 1.0) (beta 1.0) (side +left+) (uplo +upper+))
   "Symmetric AMTX multiply by BSMTH.
 If BSMTH is a matrix, use `symm!', otherwise use `symv!'."
   (check-types amtx bsmth csmth)
@@ -448,7 +448,7 @@ If BSMTH is a matrix, use `symm!', otherwise use `symv!'."
              #:side side #:uplo uplo)
       (symv! amtx bsmth csmth
              #:alpha alpha #:beta beta #:uplo uplo)))
-(define* (sym amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+))
+(define* (sym amtx bsmth #:key (alpha 1.0) (side +left+) (uplo +upper+))
   "Non-destructive version of `sym!'.
 Returns CSMTH as a result of multiplication."
   (check-types amtx bsmth)
@@ -459,7 +459,7 @@ Returns CSMTH as a result of multiplication."
       (symv amtx bsmth
             #:alpha alpha #:uplo uplo)))
 
-(define* (trm! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+(define* (trm! amtx bsmth #:key (alpha 1.0) (side +left+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   "Triangular AMTX multiplication by BSMTH.
 If BSMTH is a matrix, use `trmm!', otherwise `trmv!'."
   (check-types amtx bsmth)
@@ -470,7 +470,7 @@ If BSMTH is a matrix, use `trmm!', otherwise `trmv!'."
       (trmv! amtx bsmth
              #:uplo uplo #:transpose (ensure-transpose transpose) #:diag diag)))
 
-(define* (trs! amtx bsmth #:key (alpha 1.0) (side +right+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
+(define* (trs! amtx bsmth #:key (alpha 1.0) (side +left+) (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
   "Multiplication of inverse of AMTX by BSMTH.
 Use `trsm!' if BSMTH is matrix, `trsv!' otherwise."
   (check-types amtx bsmth)
