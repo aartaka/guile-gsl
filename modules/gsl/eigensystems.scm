@@ -4,6 +4,7 @@
   #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-8)
   #:export (alloc
             free
             solve!))
@@ -26,14 +27,17 @@ Modifies the MTX."
     ((foreign-fn "gsl_eigen_symmv" '(* * * *) int)
      (mtx:unwrap mtx) (vec:unwrap evalues-vec) (mtx:unwrap evectors-mtx) workspace)
     (free workspace)
-    (list evalues-vec evectors-mtx)))
+    (values evalues-vec evectors-mtx)))
 (define* (solve mtx #:key
                  (evalues-vec (vec:alloc (mtx:columns mtx)))
                  (evectors-mtx (mtx:alloc (mtx:columns mtx) (mtx:columns mtx))))
   "Same as `solve!' but creates a new matrix for computations.
 MTX remains unchanged."
-  (let* ((copy (mtx:copy! mtx))
-         (result (solve! copy
-                         #:evalues-vec evalues-vec #:evectors-mtx evectors-mtx)))
-    (mtx:free copy)
-    result))
+  (let* ((copy (mtx:copy! mtx)))
+    (receive (evalues-vec evectors-mtx)
+        (solve! copy
+                #:evalues-vec evalues-vec #:evectors-mtx evectors-mtx)
+      (mtx:free copy)
+      ;; A more elegant way to do this? Something like CL's
+      ;; values-list?
+      (values evalues-vec evectors-mtx))))

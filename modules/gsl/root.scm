@@ -4,6 +4,7 @@
   #:use-module (system foreign)
   #:use-module (system foreign-library)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-8)
   #:use-module (rnrs bytevectors)
   #:use-module (ice-9 match)
   #:export-syntax (with)
@@ -137,14 +138,14 @@
              function)
          (if (procedure? function+derivative)
              (procedure->pointer void (lambda (x params f df)
-                                        (match (function+derivative x)
-                                          ((fun deriv)
-                                           (bytevector-ieee-double-native-set!
-                                            (pointer->bytevector f (sizeof double))
-                                            0 fun)
-                                           (bytevector-ieee-double-native-set!
-                                            (pointer->bytevector df (sizeof double))
-                                            0 deriv))))
+                                        (receive (fun deriv)
+                                            (function+derivative x)
+                                          (bytevector-ieee-double-native-set!
+                                           (pointer->bytevector f (sizeof double))
+                                           0 fun)
+                                          (bytevector-ieee-double-native-set!
+                                           (pointer->bytevector df (sizeof double))
+                                           0 deriv)))
                                  `(,double * * *))
              function+derivative)
          %null-pointer)))
@@ -169,8 +170,8 @@
          (wrap-polisher-function
           function derivative
           (or function+derivative
-              (lambda (x) (list (function x)
-                                (derivative x)))))
+              (lambda (x) (values (function x)
+                                  (derivative x)))))
          approximate-root))
        ((or function derivative function+derivative approximate-root)
         (warn "Expecting at least FUNCTION, DERIVATIVE, and APPROXIMATE-ROOT.")))))
