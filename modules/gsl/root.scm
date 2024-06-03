@@ -155,6 +155,14 @@
                   #:key (function #f) (derivative #f)
                   (function+derivative #f)
                   approximate-root upper lower)
+  "Modify the state of SOLVER/POLISHER.
+If `solver?'
+- FUNCTION must be a pointer or procedure (X) returning real.
+- LOWER and UPPER must be reals.
+if `polisher?'
+- FUNCTION and DERIVATIVE are pointers of procedures (X) returning real.
+- FUNCTION+DERIVATIVE is a procedure (X) returning two real values.
+- APPROXIMATE-ROOT is a real."
   (if (solver? solver/polisher)
       (cond
        ((and function upper lower)
@@ -187,7 +195,8 @@ For solvers, provide FUNCTION, UPPER, and LOWER.
 For polishers, provide FUNCTION, DERIVATIVE, APPROXIMATE-ROOT, and,
 optionally, FUNCTION+DERIVATIVE.
 FUNCTION, DERIVATIVE, and FUNCTION+DERIVATIVE can be procedures or
-pointers to foreign functions."
+pointers to foreign functions.
+See `modify!' for detailed argument specification."
   (assert-types solver/polisher pointer?)
   (assert-types function pointer? procedure?)
   (cond
