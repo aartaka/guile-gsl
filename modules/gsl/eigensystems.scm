@@ -32,8 +32,8 @@ Modifies the MTX."
                  (evectors-mtx (mtx:alloc (mtx:columns mtx) (mtx:columns mtx))))
   "Same as `solve!' but creates a new matrix for computations.
 MTX remains unchanged."
-  (let ((copy (mtx:copy! mtx))
-        (result (solve! copy
-                        #:evalues-vec evalues-vec #:evectors-mtx evectors-mtx)))
+  (let* ((copy (mtx:copy! mtx))
+         (result (solve! copy
+                         #:evalues-vec evalues-vec #:evectors-mtx evectors-mtx)))
     (mtx:free copy)
     result))

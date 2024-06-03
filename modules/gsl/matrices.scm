@@ -412,7 +412,7 @@ The result is stored in MTX1 and MTX2 remains unchanged."
                          "gsl_matrix_mul_elements"
                          "gsl_matrix_float_mul_elements") '(* *) int)
    (unwrap mtx1) (unwrap mtx2)))
-(define (multiply-elements)
+(define (multiply-elements mtx1 mtx2)
   "Like `multiply-elements!', but creates and returns a new matrix for the result."
   ((act-on-copy multiply-elements!) mtx1 mtx2))
 

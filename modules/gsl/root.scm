@@ -82,9 +82,9 @@
   (pointer->string
    (if (solver? solver/polisher)
        ((foreign-fn "gsl_root_fsolver_name" '(*) '*)
-        (unwrap-solver solver))
+        (unwrap-solver solver/polisher))
        ((foreign-fn "gsl_root_fdfsolver_name" '(*) '*)
-        (unwrap-polisher polisher)))))
+        (unwrap-polisher solver/polisher)))))
 
 (define (root solver/polisher)
   "Current approximation of root in SOLVER/POLISHER."
