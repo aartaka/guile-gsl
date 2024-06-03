@@ -475,10 +475,10 @@ The result is stored in MTX."
 (define* (call-with-mtx rows columns thunk #:optional (fill #f) (type 'f64))
   "Call THUNK on a new ROWxCOLUMNS FILL-ed matrix.
 Free the matrix afterwards."
-  (let* ((mtx (alloc rows columns fill type))
-         (result (thunk mtx)))
-    (free mtx)
-    result))
+  (let* ((mtx (alloc rows columns fill type)))
+    (with-cleanup
+     (free mtx)
+     (thunk mtx))))
 
 (define-syntax-rule (with (mtx rows columns arg ...) body ...)
   "Run BODY with MTX bound to ROWSxCOLUMNS matrix initialized with ARGS."
@@ -490,10 +490,10 @@ Free the matrix afterwards."
 
 (define* (call-with-row mtx row thunk)
   "Call THUNK with a temporary vector created from ROWth row of MTX."
-  (let* ((vec (row->vec! mtx row))
-         (result (thunk vec)))
-    (vec:free vec)
-    result))
+  (let* ((vec (row->vec! mtx row)))
+    (with-cleanup
+     (vec:free vec)
+     (thunk vec))))
 (define-syntax-rule (with-row (vec mtx row) body ...)
   "Run BODY with VEC bound to the ROWth row of MTX."
   (call-with-row
@@ -503,10 +503,10 @@ Free the matrix afterwards."
 
 (define* (call-with-column mtx column thunk)
   "Call THUNK with a temporary vector created from MTX COLUMNth column."
-  (let* ((vec (column->vec! mtx column))
-         (result (thunk vec)))
-    (vec:free vec)
-    result))
+  (let* ((vec (column->vec! mtx column)))
+    (with-cleanup
+     (vec:free vec)
+     (thunk vec))))
 (define-syntax-rule (with-column (vec mtx column) body ...)
   "Run BODY with VEC bound to the COLUMNth column of MTX."
   (call-with-column

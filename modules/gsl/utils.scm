@@ -9,7 +9,8 @@
             sequence-ref
             sequence-length
             for-sequence
-            foreign-fn))
+            foreign-fn
+            with-cleanup))
 
 (define (sequence? seq)
   (or (list? seq)
@@ -56,3 +57,12 @@
 (define-syntax-rule (assert-types thing type ...)
   (assert
    (or (type thing) ...)))
+
+(define-syntax-rule (with-cleanup cleanup body ...)
+  (dynamic-wind
+    (lambda ()
+      #t)
+    (lambda ()
+      body ...)
+    (lambda ()
+      cleanup)))

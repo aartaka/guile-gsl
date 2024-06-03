@@ -265,10 +265,10 @@ Return current root approximation if successful, #f on error."
 (define (call-with solver/polisher thunk . args)
   "Call THUNK with newly `alloc'-ated SOLVER/POLISHER.
 Free it automatically and return result of THUNK."
-  (let* ((solver/polisher (apply alloc solver/polisher args))
-         (result (thunk solver/polisher)))
-    (free solver/polisher)
-    result))
+  (let* ((solver/polisher (apply alloc solver/polisher args)))
+    (with-cleanup
+     (free solver/polisher)
+     (thunk solver/polisher))))
 
 (define* (optimize solver/polisher iterations relative-error . args)
   "Return the root (or #f) for SOLVER/POLISHER.

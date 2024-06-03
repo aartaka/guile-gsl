@@ -377,10 +377,10 @@ The result is stored in VEC"
 (define* (call-with-vec size thunk #:optional (fill #f) (type 'f64))
   "Call THUNK with a new SIZE-d and TYPEd vector FILLed with data.
 Free the vector afterwards."
-  (let* ((vec (alloc size fill type))
-         (result (thunk vec)))
-    (free vec)
-    result))
+  (let* ((vec (alloc size fill type)))
+    (with-cleanup
+     (free vec)
+     (thunk vec))))
 
 (define-syntax-rule (with (vec size arg ...) body ...)
   "Run BODY with VEC bound to SIZE-d vector FILLed with data."
