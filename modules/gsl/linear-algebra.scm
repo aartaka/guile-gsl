@@ -7,11 +7,13 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-8)
   #:export (decompose
+            %invert
+            %invert!
             invert
-            invert!
-            determinant
-            determinant-log
-            determinant-sign))
+            %determinant
+            %determinant-log
+            %determinant-sign
+            determinant))
 
 (define (decompose mtx)
   (assert-types mtx mtx:mtx?)
