@@ -3,14 +3,14 @@
   #:use-module (system foreign)
   #:use-module (system foreign-library)
   #:use-module (rnrs base)
-  #:export-syntax (assert-types)
+  #:export-syntax (assert-types
+                   with-cleanup)
   #:export (make-c-ptr
             sequence?
             sequence-ref
             sequence-length
             for-sequence
-            foreign-fn
-            with-cleanup))
+            foreign-fn))
 
 (define (sequence? seq)
   (or (list? seq)
