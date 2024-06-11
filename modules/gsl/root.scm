@@ -301,7 +301,7 @@ Example from GSL docs might be rewritten as:
               (cond
                ((solver? solver/polisher)
                 (test-interval solver/polisher 0 relative-error))
-               (prev-approximation
+               ((and prev-approximation approximation)
                 (test-delta prev-approximation approximation 0 relative-error))
                (else
                 #f))
