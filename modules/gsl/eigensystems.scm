@@ -7,7 +7,8 @@
   #:use-module (srfi srfi-8)
   #:export (alloc
             free
-            solve!))
+            solve!
+            sort!))
 
 (define alloc
   (foreign-fn "gsl_eigen_symmv_alloc" (list size_t) '*))
@@ -41,3 +42,12 @@ MTX remains unchanged."
       ;; A more elegant way to do this? Something like CL's
       ;; values-list?
       (values evalues-vec evectors-mtx))))
+
+(define* (sort! evalues-vec evectors-mtx #:optional (ascending? #t))
+  ((foreign-fn "gsl_eigen_symmv_sort" `(* * ,int))
+   (vec:unwrap evalues-vec) (mtx:unwrap evectors-mtx)
+   (if ascending?
+       ;; GSL_EIGEN_SORT_VAL_ASC
+       0
+       ;; GSL_EIGEN_SORT_VAL_DESC
+       1)))
