@@ -1,6 +1,7 @@
 (define-module (gsl linear-algebra)
   #:use-module (gsl utils)
   #:use-module (gsl core)
+  #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module ((gsl matrices) #:prefix mtx:)
   #:use-module (system foreign)
   #:use-module (system foreign-library)
@@ -13,7 +14,8 @@
             %determinant
             %determinant-log
             %determinant-sign
-            determinant))
+            determinant
+            solve))
 
 (define (decompose mtx)
   (assert-types mtx mtx:mtx?)
@@ -59,3 +61,9 @@
             (det-sign (%determinant-sign decomposed signum)))
         (mtx:free copy)
         (values det det-log det-sign)))))
+
+(define* (solve decomposed permutations bvec
+                #:optional (xvec (vec:alloc (vec:length bvec))))
+  ((foreign-fn "gsl_linalg_LU_solve" '(* * * *))
+   (mtx:unwrap decomposed) permutations (vec:unwrap bvec) (vec:unwrap xvec))
+  xvec)
