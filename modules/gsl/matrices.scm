@@ -7,6 +7,7 @@
   #:use-module (srfi srfi-9 gnu)
   #:use-module (srfi srfi-43)
   #:export-syntax (with
+                   with-copy
                    with-column
                    with-row)
   #:export (;; Wrapping
@@ -74,6 +75,8 @@
             add-constant
             ;; Helpers
             call-with-mtx
+            call-with
+            call-with-copy
             call-with-row
             call-with-column
             for-mtx
@@ -476,7 +479,6 @@ The result is stored in MTX."
   "Like `add-constant!', but creates and returns a new matrix for the result."
   (act-on-copy add-constant!))
 
-;; TODO: call-with-copy
 (define* (call-with-mtx rows columns thunk #:optional (fill #f) (type 'f64))
   "Call THUNK on a new ROWxCOLUMNS FILL-ed matrix.
 Free the matrix afterwards."
@@ -484,7 +486,7 @@ Free the matrix afterwards."
     (with-cleanup
      (free mtx)
      (thunk mtx))))
-
+(define call-with call-with-mtx)
 (define-syntax-rule (with (mtx rows columns arg ...) body ...)
   "Run BODY with MTX bound to ROWSxCOLUMNS matrix initialized with ARGS."
   (call-with-mtx
@@ -492,6 +494,17 @@ Free the matrix afterwards."
    (lambda (mtx)
      body ...)
    arg ...))
+
+(define (call-with-copy mtx thunk)
+  (let ((copy (copy! mtx)))
+    (with-cleanup
+     (free copy)
+     (thunk copy))))
+(define-syntax-rule (with-copy (var mtx) body ...)
+  "Run BODY with VAR bound to copy of MTX."
+  (call-with-copy
+   mtx (lambda (var)
+         body ...)))
 
 (define* (call-with-row mtx row thunk)
   "Call THUNK with a temporary vector created from ROWth row of MTX."

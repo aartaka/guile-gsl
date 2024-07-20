@@ -5,7 +5,8 @@
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-9 gnu)
   #:use-module (srfi srfi-43)
-  #:export-syntax (with)
+  #:export-syntax (with
+                   with-copy)
   #:export (;; Wrapping
             wrap
             unwrap
@@ -57,6 +58,7 @@
             axpby!
             ;; Utils
             call-with-vec
+            call-with-copy
             for-vec
             for-each))
 
@@ -373,7 +375,6 @@ The result is stored in VEC"
              (foreign-fn "gsl_vector_float_axpby" `(,float * ,float *) int))
    (unwrap alpha) x (unwrap beta) y))
 
-;; TODO: call-with-copy
 (define* (call-with-vec size thunk #:optional (fill #f) (type 'f64))
   "Call THUNK with a new SIZE-d and TYPEd vector FILLed with data.
 Free the vector afterwards."
@@ -381,7 +382,6 @@ Free the vector afterwards."
     (with-cleanup
      (free vec)
      (thunk vec))))
-
 (define-syntax-rule (with (vec size arg ...) body ...)
   "Run BODY with VEC bound to SIZE-d vector FILLed with data."
   (call-with-vec
@@ -389,6 +389,16 @@ Free the vector afterwards."
    (lambda (vec)
      body ...)
    arg ...))
+
+(define (call-with-copy vec thunk)
+  (let ((copy (copy! vec)))
+    (with-cleanup
+     (free copy)
+     (thunk copy))))
+(define-syntax-rule (with-copy (var vec) body ...)
+  (call-with-copy
+   vec (lambda (var)
+         body ...)))
 
 (define (for-vec thunk vec)
   "Call THUNK with (INDEX VALUE) of every element in VEC."
