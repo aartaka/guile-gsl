@@ -200,7 +200,7 @@ FILL might be one of:
                        ((f32) "gsl_matrix_float_calloc")) (list size_t size_t) '*)
          row columns)
         type))
-(define (alloc-square size #:optional (fill #f) (type 'f64))
+(define* (alloc-square size #:optional (fill #f) (type 'f64))
   "Allocate a square matrix with rows == columns == SIZE.
 FILL and TYPE as per `alloc'."
   (alloc size size fill type))
