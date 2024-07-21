@@ -196,12 +196,12 @@ FILL might be one of:
         (error "Don't know how to fill a matrix with" fill))))
     mtx))
 (define make alloc)
-(define* (calloc row columns #:optional (type 'f64))
+(define* (calloc rows columns #:optional (type 'f64))
   "Allocate a new TYPEd matrix of ROWxCOLUMNS initialized to 0."
   (wrap ((foreign-fn (case type
                        ((f64) "gsl_matrix_calloc")
                        ((f32) "gsl_matrix_float_calloc")) (list size_t size_t) '*)
-         row columns)
+         rows columns)
         type))
 (define* (alloc-square size #:optional (fill #f) (type 'f64))
   "Allocate a square matrix with rows == columns == SIZE.
