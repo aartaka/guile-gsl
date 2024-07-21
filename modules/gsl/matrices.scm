@@ -231,25 +231,44 @@ In either case, return resultant identity matrix."
      (unwrap mtx))
     mtx))
 
-(define* (copy! src #:optional (dest #t))
+(define* (copy! src #:optional (dest #t)
+                (start-row 0) (start-column 0)
+                (end-row (rows src)) (end-column (columns src)))
   "Copy the SRC matrix to DEST and return DEST.
 DEST can be one of:
 - #t to create a new matrix (default) and return it.
-- Pointer/matrix to copy the SRC into it."
-  (let ((real-dest (cond
-                    ((eq? #t dest)
-                     (unwrap
-                      (alloc (rows src) (columns src) 0 (type src))))
-                    ((pointer? dest)
-                     dest)
-                    ((mtx? dest)
-                     (unwrap dest))
-                    (else
-                     (error "Cannot copy the matrix into " dest)))))
-    ((foreign-fn (dispatch src
-                           "gsl_matrix_memcpy"
-                           "gsl_matrix_float_memcpy") '(* *) int)
-     real-dest (unwrap src))
+- Pointer/matrix to copy the SRC into it.
+
+In case START-ROW, START-COLUMN (inclusive), END-ROW, and/or
+END-COLUMN (exclusive) are provided, copy a submatrix of SRC, instead
+of all of it."
+  (let* ((src-rows (rows src))
+         (src-columns (columns src))
+         (rows (- end-row start-row))
+         (columns (- end-column start-column))
+         (real-dest (cond
+                     ((eq? #t dest)
+                      (unwrap
+                       (alloc rows columns 0 (type src))))
+                     ((pointer? dest)
+                      dest)
+                     ((mtx? dest)
+                      (unwrap dest))
+                     (else
+                      (error "Cannot copy the matrix into " dest)))))
+    (if (and (= src-rows rows)
+             (= src-columns columns))
+        ((foreign-fn (dispatch src
+                               "gsl_matrix_memcpy"
+                               "gsl_matrix_float_memcpy") '(* *) int)
+         real-dest (unwrap src))
+        (do ((src-row start-row (1+ src-row))
+             (dest-row 0 (1+ dest-row)))
+            ((= src-row end-row))
+          (do ((src-column start-column (1+ src-column))
+               (dest-column 0 (1+ dest-column)))
+              ((= src-column end-column))
+            (set! (wrap real-dest (type src)) dest-row dest-column (get src src-row src-column)))))
     (wrap real-dest (type src))))
 
 (define (->2d-vector mtx)
