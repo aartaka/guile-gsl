@@ -91,10 +91,11 @@
 (set-record-type-printer!
  <mtx>
  (lambda (v p)
-   (format p "#<gsl_matrix~a of ~ax~a ~a>"
+   (format p "#<gsl_matrix~a 0x~x of ~ax~a ~a>"
            (if (eq? 'f32 (type v))
                "_float"
                "")
+           (pointer-address (unwrap v))
            (rows v)
            (columns v)
            (cond

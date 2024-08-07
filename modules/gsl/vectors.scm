@@ -70,10 +70,11 @@
 (set-record-type-printer!
  <vec>
  (lambda (v p)
-   (format p "#<gsl_vector~a of ~d ~a>"
+   (format p "#<gsl_vector~a 0x~x of ~d ~a>"
            (if (eq? 'f32 (type v))
                "_float"
                "")
+           (pointer-address (unwrap v))
            (length v)
            (cond
             ((null? v) "zeros")
