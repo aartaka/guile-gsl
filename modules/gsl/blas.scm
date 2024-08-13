@@ -233,11 +233,11 @@
   "Non-destructive `gemv!', creating and returning YVEC."
   (check-types amtx xvec)
   (let ((yvec (vec:alloc (if (= (ensure-transpose transpose) +no-trans+)
-                             (mtx:columns amtx)
-                             (mtx:rows amtx))
+                             (mtx:rows amtx)
+                             (mtx:columns amtx))
                          0 (mtx:type amtx))))
     (gemv! amtx xvec yvec
-           #:beta 0  #:alpha alpha #:transpose (ensure-transpose transpose))
+           #:beta 0 #:alpha alpha #:transpose (ensure-transpose transpose))
     yvec))
 
 (define* (trmv! amtx xvec #:key (uplo +upper+) (transpose +no-trans+) (diag +non-unit+))
