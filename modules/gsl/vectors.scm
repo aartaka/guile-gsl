@@ -26,6 +26,7 @@
             calloc
             free
             copy!
+            copy
             fill!
             basis!
             ->vector
@@ -213,6 +214,8 @@ DEST can be one of:
                  '(* *) int)
      real-dest (unwrap src))
     (wrap real-dest (type src))))
+(define (copy src)
+  (copy! src #t))
 
 (define (swap! a b)
   "Exchange the values between A and B (vectors)."

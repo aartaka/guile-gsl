@@ -33,6 +33,7 @@
             alloc-square
             free
             copy!
+            copy
             fill!
             identity!
             ->2d-vector
@@ -252,6 +253,8 @@ DEST can be one of:
                            "gsl_matrix_float_memcpy") '(* *) int)
      real-dest (unwrap src))
     (wrap real-dest (type src))))
+(define (copy src)
+  (copy! src #t))
 
 (define (->2d-vector mtx)
   "Convert MTX to a Scheme vector of vectors of numbers."
