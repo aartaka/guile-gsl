@@ -1,4 +1,5 @@
 (define-module (gsl vectors)
+  #:use-module (rnrs bytevectors)
   #:use-module (gsl utils)
   #:use-module (system foreign)
   #:use-module (srfi srfi-1)
@@ -136,6 +137,7 @@ FILL might be one of:
   zero-initialized or numeric FILL for constant-initialized vector).
 - Real number to fill the vector with the same double value.
 - Scheme vector/list of real numbers.
+- Pointer to memory with K floats/doubles to copy TYPEd data from.
 - Another allocated vector to copy the contents."
   (let ((vec (wrap ((foreign-fn (case type
                                   ((f64) "gsl_vector_alloc")
@@ -157,6 +159,16 @@ FILL might be one of:
          fill))
        ((vec? fill)
         (copy! fill vec))
+       ((pointer? fill)
+        (let* ((len (length vec))
+               (bv (pointer->bytevector fill len 0 type)))
+          (do ((idx 0 (1+ idx)))
+              ((= idx len))
+            (set! vec idx
+                  ((if (eq? type 'f32)
+                       bytevector-ieee-single-native-ref
+                       bytevector-ieee-double-native-ref)
+                   bv (* idx (sizeof double)))))))
        (else
         (error "Don't know how to fill a vector with" fill))))
     vec))

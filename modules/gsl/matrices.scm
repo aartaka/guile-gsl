@@ -1,4 +1,5 @@
 (define-module (gsl matrices)
+  #:use-module (rnrs bytevectors)
   #:use-module (gsl utils)
   #:use-module ((gsl vectors) #:prefix vec:)
   #:use-module (system foreign)
@@ -168,6 +169,7 @@ FILL might be one of:
   matrices).
 - Real number to fill the matrix with the same double value.
 - A list/vector of lists/vectors with numbers to fill in.
+- Pointer to memory with N-ROWS*N-COLUMNS floats/doubles to copy TYPEd data from.
 - Or another allocated matrix to copy its contents."
   (let ((mtx (wrap ((foreign-fn (case type
                                   ((f64) "gsl_matrix_alloc")
@@ -194,6 +196,20 @@ FILL might be one of:
          fill))
        ((mtx? fill)
         (copy! fill mtx))
+       ((pointer? fill)
+        (let* ((rows (rows mtx))
+               (columns (columns mtx))
+               (bv (pointer->bytevector fill (* rows columns) 0 type)))
+          (do ((row 0 (1+ row)))
+              ((= row rows))
+            (do ((column 0 (1+ column)))
+                ((= column columns))
+              (set! mtx row column
+                    ((if (eq? type 'f32)
+                         bytevector-ieee-single-native-ref
+                         bytevector-ieee-double-native-ref)
+                     bv (* (sizeof double)
+                           (+ column (* row columns)))))))))
        (else
         (error "Don't know how to fill a matrix with" fill))))
     mtx))
