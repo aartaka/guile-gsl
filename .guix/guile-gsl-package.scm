@@ -8,13 +8,6 @@
  #:use-module (guix git-download)
  #:use-module ((guix licenses) #:prefix license:))
 
-(define-public gsl-debug
-  (package/inherit
-      gsl
-    (outputs '("out"
-               "static"
-               "debug"))))
-
 (define-public guile-gsl-git
   (package
     (name "guile-gsl-git")
