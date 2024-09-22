@@ -396,10 +396,15 @@ DEST might be one of:
                     ((mtx? dest)     (unwrap dest))
                     ((pointer? dest) dest)
                     (else (error "Cannot copy transposed matrix into " dest)))))
-    ((foreign-fn (dispatch mtx
-                           "gsl_matrix_transpose_memcpy"
-                           "gsl_matrix_float_transpose_memcpy") '(* *) int)
-     real-dest (unwrap mtx))
+    (if (eq? dest #f)
+        ((foreign-fn (dispatch mtx
+                               "gsl_matrix_transpose"
+                               "gsl_matrix_float_transpose") '(*) int)
+         (unwrap mtx))
+        ((foreign-fn (dispatch mtx
+                               "gsl_matrix_transpose_memcpy"
+                               "gsl_matrix_float_transpose_memcpy") '(* *) int)
+         real-dest (unwrap mtx)))
     (wrap real-dest (type mtx))))
 
 ;; Math operations
