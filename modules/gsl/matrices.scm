@@ -416,49 +416,49 @@ DEST might be one of:
       (op new arg)
       new)))
 
-(define (add! mtx1 mtx2)
-  "This function adds the elements of matrix MTX2 to the elements of MTX1.
-The result is stored in MTX1 and MTX2 remains unchanged."
-  ((foreign-fn (dispatch mtx1
+(define (add! augend-mtx addend-mtx)
+  "This function adds the elements of ADDEND-MTX to the elements of AUGEND-MTX.
+The result is stored in AUGEND-MTX and ADDEND-MTX remains unchanged."
+  ((foreign-fn (dispatch augend-mtx
                          "gsl_matrix_add"
                          "gsl_matrix_float_add") '(* *) int)
-   (unwrap mtx1) (unwrap mtx2)))
-(define (add mtx1 mtx2)
+   (unwrap augend-mtx) (unwrap addend-mtx)))
+(define (add augend-mtx addend-mtx)
   "Like `add!', but creates and returns a new matrix for the result."
-  ((act-on-copy add!) mtx1 mtx2))
+  ((act-on-copy add!) augend-mtx addend-mtx))
 
-(define (subtract! mtx1 mtx2)
-  "This function subtracts the elements of matrix MTX2 from the elements of matrix MTX1.
-The result is stored in MTX1 and MTX2 remains unchanged."
-  ((foreign-fn (dispatch mtx1
+(define (subtract! minuend-mtx subtrahend-mtx)
+  "This function subtracts the elements of SUBTRAHEND-MTX from the elements of MINUEND-MTX
+The result is stored in MINUEND-MTX and SUBTRAHEND-MTX remains unchanged."
+  ((foreign-fn (dispatch minuend-mtx
                          "gsl_matrix_sub"
                          "gsl_matrix_float_sub") '(* *) int)
-   (unwrap mtx1) (unwrap mtx2)))
-(define (subtract mtx1 mtx2)
+   (unwrap minuend-mtx) (unwrap subtrahend-mtx)))
+(define (subtract minuend-mtx subtrahend-mtx)
   "Like `subtract!', but creates and returns a new matrix for the result."
-  ((act-on-copy subtract!) mtx1 mtx2))
+  ((act-on-copy subtract!) minuend-mtx subtrahend-mtx))
 
-(define (multiply-elements! mtx1 mtx2)
-  "This function multiplies the elements of matrix MTX1 by the elements of matrix MTX2.
-The result is stored in MTX1 and MTX2 remains unchanged."
-  ((foreign-fn (dispatch mtx1
+(define (multiply-elements! multiplicand-mtx multiplier-mtx)
+  "This function multiplies the elements of MULTIPLICAND-MTX by the elements of MULTIPLIER-MTX.
+The result is stored in MULTIPLICAND-MTX and MULTIPLIER-MTX remains unchanged."
+  ((foreign-fn (dispatch multiplicand-mtx
                          "gsl_matrix_mul_elements"
                          "gsl_matrix_float_mul_elements") '(* *) int)
-   (unwrap mtx1) (unwrap mtx2)))
-(define (multiply-elements mtx1 mtx2)
+   (unwrap multiplicand-mtx) (unwrap multiplier-mtx)))
+(define (multiply-elements multiplicand-mtx multiplier-mtx)
   "Like `multiply-elements!', but creates and returns a new matrix for the result."
-  ((act-on-copy multiply-elements!) mtx1 mtx2))
+  ((act-on-copy multiply-elements!) multiplicand-mtx multiplier-mtx))
 
-(define (divide-elements! mtx1 mtx2)
-  "This function divides the elements of matrix MTX1 by the elements of matrix MTX2.
-The result is stored in MTX1 and MTX2 remains unchanged."
-  ((foreign-fn (dispatch mtx1
+(define (divide-elements! dividend-mtx divisor-mtx)
+  "This function divides the elements of DIVIDEND-MTX by the elements of DIVISOR-MTX.
+The result is stored in DIVIDEND-MTX and DIVISOR-MTX remains unchanged."
+  ((foreign-fn (dispatch dividend-mtx
                          "gsl_matrix_div_elements"
                          "gsl_matrix_float_div_elements") '(* *) int)
-   (unwrap mtx1) (unwrap mtx2)))
-(define (divide-elements mtx1 mtx2)
+   (unwrap dividend-mtx) (unwrap divisor-mtx)))
+(define (divide-elements dividend-mtx divisor-mtx)
   "Like `divide-elements!', but creates and returns a new matrix for the result."
-  ((act-on-copy divide-elements!) mtx1 mtx2))
+  ((act-on-copy divide-elements!) dividend-mtx divisor-mtx))
 
 (define (scale! mtx scalar)
   "This function multiplies the elements of matrix MTX by the SCALAR.
