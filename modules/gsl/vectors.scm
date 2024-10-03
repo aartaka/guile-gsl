@@ -209,7 +209,7 @@ In either case, return the resultant basis vector."
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC vector to DEST.
 DEST can be one of:
-- #t to create a new vector (default).
+- #t (default) to create a new vector.
 - Pointer to copy SRC into it."
   (let ((real-dest (cond
                     ((eq? #t dest)

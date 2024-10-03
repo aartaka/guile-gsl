@@ -252,7 +252,7 @@ In either case, return resultant identity matrix."
 (define* (copy! src #:optional (dest #t))
   "Copy the SRC matrix to DEST and return DEST.
 DEST can be one of:
-- #t to create a new matrix (default) and return it.
+- #t (default) to create a new matrix and return it.
 - Pointer/matrix to copy the SRC into it."
   (let ((real-dest (cond
                     ((eq? #t dest)
