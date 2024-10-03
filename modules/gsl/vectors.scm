@@ -310,57 +310,57 @@ DEST can be one of:
       (op new arg)
       new)))
 
-(define (add! vec1 vec2)
-  "This function adds the elements of vector VEC2 to the elements of vector VEC1.
-The result is stored in VEC1 and VEC2 remains unchanged. The two
+(define (add! augend-vec addend-vec)
+  "This function adds the elements of ADDEND-VEC to the elements of AUGEND-VEC.
+The result is stored in AUGEND-VEC and ADDEND-VEC remains unchanged. The two
 vectors must have the same length."
-  ((foreign-fn (dispatch vec1
+  ((foreign-fn (dispatch augend-vec
                          "gsl_vector_add"
                          "gsl_vector_float_add") '(* *) int)
-   (unwrap vec1) (unwrap vec2)))
-(define (add vec1 vec2)
+   (unwrap augend-vec) (unwrap addend-vec)))
+(define (add augend-vec addend-vec)
   "Like `add!', but creates a new vector for the result of the addition.
-Both VEC1 and VEC2 are unaffected by the operation."
-  ((act-on-copy add!) vec1 vec2))
+Both AUGEND-VEC and ADDEND-VEC are unaffected by the operation."
+  ((act-on-copy add!) augend-vec addend-vec))
 
-(define (subtract! vec1 vec2)
-  "This function subtracts the elements of vector VEC2 from the elements of VEC1.
-The resultis stored in VEC1 and VEC2 remains unchanged.  The two
-vectors must have the same length."
-  ((foreign-fn (dispatch vec1
+(define (subtract! minuend-vec subtrahend-vec)
+  "This function subtracts the elements of SUBTRAHEND-VEC from the elements of MINUEND-VEC.
+The result is stored in MINUEND-VEC and SUBTRAHEND-VEC remains
+unchanged. The two vectors must have the same length."
+  ((foreign-fn (dispatch minuend-vec
                          "gsl_vector_sub"
                          "gsl_vector_float_sub") '(* *) int)
-   (unwrap vec1) (unwrap vec2)))
-(define (subtract vec1 vec2)
+   (unwrap minuend-vec) (unwrap subtrahend-vec)))
+(define (subtract minuend-vec subtrahend-vec)
   "Like `subtract!', but creates a new vector for the result of the subtraction.
-Both VEC1 and VEC2 are unaffected by the operation."
-  ((act-on-copy subtract!) vec1 vec2))
+Both MINUEND-VEC and SUBTRAHEND-VEC are unaffected by the operation."
+  ((act-on-copy subtract!) minuend-vec subtrahend-vec))
 
-(define (multiply! vec1 vec2)
-  "This function multiplies the elements of vector VEC1 by the elements of vector VEC2.
-The result is stored in VEC1 and VEC2 remains unchanged. The two
-vectors must have the same length."
-  ((foreign-fn (dispatch vec1
+(define (multiply! multiplicand-vec multiplier-vec)
+  "This function multiplies the elements of MULTIPLICAND-VEC by the elements of vector MULTIPLIER-VEC.
+The result is stored in MULTIPLICAND-VEC and MULTIPLIER-VEC remains
+unchanged. The two vectors must have the same length."
+  ((foreign-fn (dispatch multiplicand-vec
                          "gsl_vector_mul"
                          "gsl_vector_float_mul") '(* *) int)
-   (unwrap vec1) (unwrap vec2)))
-(define (multiply vec1 vec2)
+   (unwrap multiplicand-vec) (unwrap multiplier-vec)))
+(define (multiply multiplicand-vec multiplier-vec)
   "Like `multiply!', but creates a new vector for the result of the multiplication.
-Both VEC1 and VEC2 are unaffected by the operation."
-  ((act-on-copy multiply!) vec1 vec2))
+Both MULTIPLICAND-VEC and MULTIPLIER-VEC are unaffected by the operation."
+  ((act-on-copy multiply!) multiplicand-vec multiplier-vec))
 
-(define (divide! vec1 vec2)
-  "This function divides the elements of vector VEC1 by the elements of vector VEC2.
-The result is stored in VEC1 and VEC2 remains unchanged. The two
+(define (divide! dividend-vec divisor-vec)
+  "This function divides the elements of vector DIVIDEND-VEC by the elements of vector DIVISOR-VEC.
+The result is stored in DIVIDEND-VEC and DIVISOR-VEC remains unchanged. The two
 vectors must have the same length."
-  ((foreign-fn (dispatch vec1
+  ((foreign-fn (dispatch dividend-vec
                          "gsl_vector_div"
                          "gsl_vector_float_div") '(* *) int)
-   (unwrap vec1) (unwrap vec2)))
-(define (divide vec1 vec2)
+   (unwrap dividend-vec) (unwrap divisor-vec)))
+(define (divide dividend-vec divisor-vec)
   "Like `divide!', but creates a new vector for the result of the division.
-Both VEC1 and VEC2 are unaffected by the operation."
-  ((act-on-copy divide!) vec1 vec2))
+Both DIVIDEND-VEC and DIVISOR-VEC are unaffected by the operation."
+  ((act-on-copy divide!) dividend-vec divisor-vec))
 
 (define (scale! vec scale)
   "This function multiplies the elements of VEC by the constant factor SCALE.
