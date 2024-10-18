@@ -10,7 +10,9 @@
   #:export-syntax (with
                    with-copy
                    with-column
-                   with-row)
+                   with-column!
+                   with-row
+                   with-row!)
   #:export (;; Wrapping
             wrap
             unwrap
@@ -80,7 +82,9 @@
             call-with
             call-with-copy
             call-with-row
+            call-with-row!
             call-with-column
+            call-with-column!
             for-mtx
             for-each
             ensure-gsl))
@@ -543,6 +547,19 @@ Free the matrix afterwards."
    mtx row
    (lambda (vec)
      body ...)))
+(define (call-with-row! mtx row thunk)
+  (let* ((vec (row->vec! mtx row)))
+    (with-cleanup
+     (begin
+       (vec->row! vec mtx row)
+       (vec:free vec))
+     (thunk vec))))
+(define-syntax-rule (with-row! (vec mtx row) body ...)
+  "Like `with-row', but save the VEC into the respective ROW in the end."
+  (call-with-row!
+   mtx row
+   (lambda (vec)
+     body ...)))
 
 (define* (call-with-column mtx column thunk)
   "Call THUNK with a temporary vector created from MTX COLUMNth column."
@@ -553,6 +570,19 @@ Free the matrix afterwards."
 (define-syntax-rule (with-column (vec mtx column) body ...)
   "Run BODY with VEC bound to the COLUMNth column of MTX."
   (call-with-column
+   mtx column
+   (lambda (vec)
+     body ...)))
+(define (call-with-column! mtx column thunk)
+  (let* ((vec (column->vec! mtx column)))
+    (with-cleanup
+     (begin
+       (vec->column! vec mtx column)
+       (vec:free vec))
+     (thunk vec))))
+(define-syntax-rule (with-column! (vec mtx column) body ...)
+  "Like `with-column', but save the VEC into the respective COLUMN in the end."
+  (call-with-column!
    mtx column
    (lambda (vec)
      body ...)))
